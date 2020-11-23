@@ -1,16 +1,13 @@
 #include <iostream>
+#include <regex>
+#include <map>
+#include <string>
 #include "lab_01.h"
 
 
-/**
- * to build call: g++ main.cpp task_01.cpp -o task
- * or make
- */
-
-
 int main() {
-	std::cout << "Ah, here we go again" << std::endl;
-	Parse2("test.p");
+    std::cout << "Ah, here we go again..." << std::endl;
+    Parse("C:/Users/Novas/Documents/GitHub/ssw_lab_5sem/lab_01/test.p");
 
-	return 0;
+    return 0;
 }
