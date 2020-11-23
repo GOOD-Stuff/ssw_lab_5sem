@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #ifndef LECS_PARS_SYNTAX_H
 #define LECS_PARS_SYNTAX_H
 

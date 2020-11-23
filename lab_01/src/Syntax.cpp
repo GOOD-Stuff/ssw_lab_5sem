@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #include "Syntax.h"
 
 /**
