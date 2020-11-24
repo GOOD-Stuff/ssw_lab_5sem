@@ -21,12 +21,14 @@ private:
     std::vector<Lexem>              lex_table;   // our table of lexemes
     std::map<std::string, Variable> id_map;      // our table of identifiers
 
+    bool error_state{ 0 };
+
     lex_it getNextLex(lex_it &iter);
     lex_it peekLex(int N, lex_it t_iter);
 
     int   expressionParse            (lex_it &t_iter);
-    int   stateParse                 (lex_it &t_iter);
-    int   compoundParse              (lex_it &t_iter);
+    int   stateParse                 (lex_it &t_iter, int compound_count);
+    int   compoundParse              (lex_it &t_iter, int compound_count);
     int   vardpParse                 (lex_it &t_iter);
     std::list<std::string> vardParse (lex_it &t_iter);
     int   blockParse                 (lex_it &t_iter);
@@ -35,6 +37,8 @@ private:
     void printError    (errors t_err, Lexem lex);
     bool checkLexem    (const lex_it &t_iter, const tokens &t_tok);
     bool isVarExist    (const std::string &t_var_name);
+    void updateVarTypes(const std::list<std::string>& t_var_list,
+        const std::string& t_type_name);
 };
 
 

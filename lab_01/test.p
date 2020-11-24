@@ -1,15 +1,7 @@
-program lol;
-    var
-        b : integer;
+program test;    
     var
         a, d : integer;
     begin
-        begin
-            a := 2;
-        end;
-        begin
-            begin
-                b := 3;
-            end;
-        end;
+    	a := 2 + d + 3 +- 0 - 1;        
+    	d := 3;
     end.

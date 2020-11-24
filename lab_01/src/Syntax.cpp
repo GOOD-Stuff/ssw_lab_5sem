@@ -48,7 +48,7 @@ int Syntax::ParseCode() {
     if (programParse(it) != 0)
         return -EXIT_FAILURE;
 
-    while(it != lex_table.end() && it->GetToken() != eof_tk)
+    while(it != lex_table.end() && it->GetToken() != dot_tk)
         blockParse(it);
     std::cout << "EOF" << std::endl;
 
@@ -112,11 +112,13 @@ int Syntax::blockParse(lex_it &t_iter) {
                 break;
             }
             case begin_tk: {
-                compoundParse(t_iter);
+                compoundParse(t_iter, 0);
                 break;
             }
             case dot_tk: {
-                std::cout << "Program was parse successfully" << std::endl;
+                if (!error_state) 
+                    std::cout << "Program was parse successfully" << std::endl;
+                
                 break;
             }
             default: {
@@ -157,6 +159,8 @@ int Syntax::vardpParse(Syntax::lex_it &t_iter) {
     if (!checkLexem(t_iter, semi_tk)) {
         printError(MUST_BE_SEMI, *t_iter);
     }
+
+    updateVarTypes(var_list, type_iter->GetName());
 
     return EXIT_SUCCESS;
 }
@@ -203,20 +207,18 @@ std::list<std::string> Syntax::vardParse(lex_it &t_iter) {
  * @return  EXIT_SUCCESS - if compound part is matched to grammar
  * @return -EXIT_FAILURE - if compound part doesn't matched to grammar
  */
-int Syntax::compoundParse(lex_it &t_iter) {
-    static int compound_count = 0; // XXX: How can this be replaced?
+int Syntax::compoundParse(lex_it &t_iter, int compound_count) {
     compound_count++;
     while (t_iter->GetToken() != end_tk) {
         if (t_iter->GetToken() == eof_tk) {
             printError(EOF_ERR, *t_iter);
             return -EXIT_FAILURE;
         }
-        stateParse(t_iter);
+        stateParse(t_iter, compound_count);
     }
 
     if (compound_count == 1) { // XXX: How can this be replaced?
-        if (checkLexem(peekLex(1, t_iter), unknown_tk) ||
-            checkLexem(peekLex(1, t_iter), eof_tk)) {
+        if ( !checkLexem(peekLex(1, t_iter), dot_tk)) {
             printError(MUST_BE_DOT, *t_iter);
             return -EXIT_FAILURE;
         }
@@ -233,7 +235,7 @@ int Syntax::compoundParse(lex_it &t_iter) {
  * @return  EXIT_SUCCESS - if state part is matched to grammar
  * @return -EXIT_FAILURE - if state part doesn't matched to grammar
  */
-int Syntax::stateParse(lex_it &t_iter) {
+int Syntax::stateParse(lex_it &t_iter, int compound_count) {
     auto iter = getNextLex(t_iter);
     switch (iter->GetToken()) {
         case id_tk: {
@@ -256,7 +258,7 @@ int Syntax::stateParse(lex_it &t_iter) {
             break;
         }
         case begin_tk: {
-            compoundParse(t_iter);
+            compoundParse(t_iter, compound_count);
             getNextLex(t_iter);
             if (!checkLexem(t_iter, semi_tk)) {
                 printError(MUST_BE_SEMI, *t_iter);
@@ -291,7 +293,9 @@ int Syntax::expressionParse(lex_it &t_iter) {
             iter = getNextLex(t_iter);
             switch (iter->GetToken()) {
                 case add_tk:
+                    expressionParse(t_iter);
                 case sub_tk:
+                    expressionParse(t_iter);
                 default: { // any other lexem, expression is over
                     break;
                 }
@@ -321,6 +325,8 @@ int Syntax::expressionParse(lex_it &t_iter) {
  * @return none
  */
 void Syntax::printError(errors t_err, Lexem lex) {
+    error_state = 1;
+
     switch(t_err) {
         case UNKNOWN_LEXEM: {
             std::cerr << "<E> Lexer: Get unknown lexem '" << lex.GetName()
@@ -362,7 +368,8 @@ void Syntax::printError(errors t_err, Lexem lex) {
             break;
         }
         case MUST_BE_DOT: {
-            std::cerr << "<E> Syntax: Program must be end by '.'" << std::endl;
+            std::cerr << "<E> Syntax: Program must be end by '.'" << lex.GetName()
+                << "' on " << lex.GetLine() << " line" << std::endl;
             break;
         }
         // TODO: Add remaining error types
@@ -443,4 +450,24 @@ bool Syntax::checkLexem(const Syntax::lex_it &t_iter, const tokens &t_tok) {
 bool Syntax::isVarExist(const std::string &t_var_name) {
     auto map_iter = id_map.find(t_var_name);
     return !(map_iter == id_map.end());
+}
+
+
+/**
+ * @brief Update information about type in map of identifiers
+ * @param[in] t_var_list  - list of variables
+ * @param[in] t_type_name - type of variables
+ *
+ * @return none
+ */
+void Syntax::updateVarTypes(const std::list<std::string>& t_var_list,
+    const std::string& t_type_name) {
+    try {
+        for (auto& el : t_var_list)
+            id_map.at(el).type = t_type_name;
+    }
+    catch (const std::exception& exp) {
+        std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
+            << exp.what() << std::endl;
+    }
 }
