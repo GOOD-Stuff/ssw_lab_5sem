@@ -294,8 +294,10 @@ int Syntax::expressionParse(lex_it &t_iter) {
             switch (iter->GetToken()) {
                 case add_tk:
                     expressionParse(t_iter);
+                    break;
                 case sub_tk:
                     expressionParse(t_iter);
+                    break;
                 default: { // any other lexem, expression is over
                     break;
                 }
