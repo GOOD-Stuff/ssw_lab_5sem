@@ -1,15 +1,11 @@
-program lol;
-    var
-        b : integer;
-    var
-        a, d : integer;
-    begin
-        begin
-            a := 2;
-        end;
-        begin
-            begin
-                b := 3;
-            end;
-        end;
-    end.
+program kekw;
+var 
+	a, b, c, d: integer;
+begin
+	a := 5;
+	b := 3;
+	c := a + b; 
+	d := a - b;
+	a := d - c + b;
+	b := a + 12;
+end.
