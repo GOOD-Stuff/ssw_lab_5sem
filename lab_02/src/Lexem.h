@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #ifndef LECS_PARS_LEXEM_H
 #define LECS_PARS_LEXEM_H
 
@@ -30,7 +26,7 @@ enum tokens {
     opb_tk,             // '('
     cpb_tk,             // ')'
 
-    eof_tk
+    eof_tk              // end of file
 };
 
 
@@ -44,25 +40,28 @@ enum errors {
     MUST_BE_TYPE,    // Error: Must be type of identifier
     MUST_BE_DOT,     // Error: Must be '.'
     MUST_BE_ASS,     // Error: Must be ':='
+    MUST_BE_BKT_END, // Error: Must be ')'
+    MUST_BE_BKT_BGN, // Error: Must be '('
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
-    // TODO: Add other types of error
 };
 
 
 class Lexem {
 public:
-    Lexem() = default;
+    Lexem() : name(""), token(unknown_tk), line(0) {};
     Lexem(std::string &&t_name, tokens t_tok, int t_line) : name(t_name),
-                                              token(t_tok), line(t_line) {};
+                                              token(t_tok), line(t_line){};
 
-    const std::string& GetName() const;
-    tokens      GetToken() const;
-    int         GetLine()  const;
+    std::string GetName();
+    tokens      GetToken();
+    int         GetLine();
+    void        RenameLex(std::string name_);
+
 private:
-    std::string name  {""};
-    tokens      token {unknown_tk};
-    int         line  {0};
+    std::string name;
+    tokens      token;
+    int         line;
 };
 
 

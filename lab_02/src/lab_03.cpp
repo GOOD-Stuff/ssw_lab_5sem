@@ -1,4 +1,21 @@
-#include "lab_02.h"
+#include "lab_03.h"
+
+
+/**
+ *
+ * program name;
+ * var a : integer;
+ *     b : integer;
+ *     c : array[1..5] of integer;
+ * begin
+ * b := 1;
+ * a := 2;
+ * end.
+ *
+ *
+ *             table of lexem:
+ *  <lexem_str>, <lexem_id>, <line in code>
+ */
 
 
 /**
@@ -19,13 +36,11 @@
 
 
 int Parse3(const std::string& file_path) {
-    std::cout << "\tPart 2" << std::endl;
-
     Lexer lex(file_path.c_str());
-    auto table = lex.ScanCode(); // create table of lexemes
+    auto table = lex.ScanCode();
 
     Syntax syntx(std::move(table));
-    syntx.ParseCode();          // start parse code
+    syntx.ParseCode();
 
     return EXIT_SUCCESS;
 }

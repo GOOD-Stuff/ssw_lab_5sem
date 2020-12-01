@@ -5,6 +5,8 @@
 #ifndef LECS_PARS_LEXER_H
 #define LECS_PARS_LEXER_H
 
+
+#include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <vector>

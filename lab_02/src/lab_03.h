@@ -2,8 +2,8 @@
 // Created by vldmr
 //
 
-#ifndef LECS_PARS_TASK_02_H
-#define LECS_PARS_TASK_02_H
+#ifndef LECS_PARS_LAB_03_H
+#define LECS_PARS_LAB_03_H
 
 #include <fstream>      // for ifstream
 #include <iostream>     // for cout/cerr
@@ -18,4 +18,4 @@
 int Parse3(const std::string& file_path);
 
 
-#endif //LECS_PARS_TASK_02_H
+#endif //LECS_PARS_LAB_03_H
