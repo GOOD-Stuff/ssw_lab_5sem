@@ -163,7 +163,7 @@ int Syntax::vardpParse(lex_it& t_iter) {
     }
     
     if (checkLexem(peekLex(1, t_iter), id_tk)) {
-        auto sec_var_list = vardParse(t_iter);
+        vardpParse(t_iter);
     }
 
     updateVarTypes(var_list, type_iter->GetName());
