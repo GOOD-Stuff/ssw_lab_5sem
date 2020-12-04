@@ -46,14 +46,14 @@ public:
     Lexem() = default;
     Lexem(std::string t_name, tokens token_tk, int t_line) : name(t_name), token(token_tk), line(t_line) {};
 
-    int GetLine() { return line; }
-    tokens GetToken() { return token; }
-    std::string GetName() { return name; }
+    int             GetLine() { return line; }
+    tokens          GetToken() { return token; }
+    std::string     GetName() { return name; }
 
 private:
-    std::string name{ "" };
-    tokens token{ unknown_tk };
-    int line{ 0 };
+    std::string     name{ "" };
+    tokens          token{ unknown_tk };
+    int             line{ 0 };
 };
 
 

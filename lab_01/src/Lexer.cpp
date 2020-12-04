@@ -40,12 +40,12 @@ Lexem Lexer::GetLex()
     try {
         auto ch = GetCurrentCurs();
         while (ch == -1 || ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t') {
+            if (ch == '\n') line++;
+
             ch = GetChar();
 
-            if (ch == '\n') line++; // line counter
 
             if (code.eof()) return Lexem(std::move("EOF"), eof_tk, line); // if end of file
-            ch = GetChar();
         }
 
         auto isId = [](char ch) {
@@ -89,7 +89,9 @@ Lexem Lexer::GetLex()
             case '+': tok = plus_tk;  break;
             case '-': tok = minus_tk; break;
             default:
-                std::cerr << "<E> Unknown token " << ch << std::endl; break;
+                std::cerr << "<E> Unknown token " << ch << std::endl;
+                tok = unknown_tk;
+                break;
             }
             lex += ch;
 
@@ -110,7 +112,7 @@ Lexem Lexer::GetLex()
 
         return Lexem(std::move(""), unknown_tk, line); //return std::make_pair("", unknown_tk);
     }
-    catch (const std::exception& exp) {
+    catch (const std::exception&) {
         return Lexem(std::move(""), unknown_tk, line); //return std::make_pair("", unknown_tk);
     }
 }

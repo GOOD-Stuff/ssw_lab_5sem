@@ -21,7 +21,7 @@ int Syntax::ParseCode() {
     if (programParse(it) != 0)
         return -EXIT_FAILURE;
 
-    while (it != lex_table.end() && it->GetToken() != eof_tk)
+    while (it != lex_table.end() && it->GetToken() != dot_tk)
         blockParse(it);
     std::cout << "EOF" << std::endl;
 
@@ -57,7 +57,7 @@ Syntax::lex_it Syntax::peekLex(int N, lex_it t_iter) {
     }
 }
 
-int Syntax::programParse(lex_it& t_iter) {
+int Syntax::programParse(lex_it &t_iter) {
     if (!checkLexem(t_iter, program_tk)) {
         printError(MUST_BE_PROG, *t_iter);
         return -EXIT_FAILURE;
@@ -109,7 +109,7 @@ int Syntax::blockParse(lex_it& t_iter) {
             break;
         }
         case dot_tk: {
-            std::cout << "Program was parse successfully" << std::endl;
+            if (!error) std::cout << "Program was parse successfully" << std::endl;
             break;
         }
         default: {
@@ -134,8 +134,7 @@ std::list<std::string> Syntax::vardParse(lex_it& t_iter) {
     }
 
     if (isVarExist(iter->GetName())) printError(DUPL_ID_ERR, *iter);
-    else
-        id_map.emplace(iter->GetName(), Variable("?", "?"));
+    else id_map.emplace(iter->GetName(), Variable("?", "?"));
 
     std::list<std::string> var_list;
     var_list.push_back(t_iter->GetName());
@@ -162,8 +161,13 @@ int Syntax::vardpParse(lex_it& t_iter) {
     if (!checkLexem(t_iter, semi_tk)) {
         printError(MUST_BE_SEMI, *t_iter);
     }
+    
+    if (checkLexem(peekLex(1, t_iter), id_tk)) {
+        auto sec_var_list = vardParse(t_iter);
+    }
 
     updateVarTypes(var_list, type_iter->GetName());
+    
     // buildVarTree(var_list, t_tree);
 
     return EXIT_SUCCESS;
@@ -220,8 +224,7 @@ int Syntax::compoundParse(lex_it& t_iter, int c_count) {
     }
 
     if (c_count == 1) { 
-        if (checkLexem(peekLex(1, t_iter), unknown_tk) ||
-            checkLexem(peekLex(1, t_iter), eof_tk)) {
+        if (!checkLexem(peekLex(1, t_iter), dot_tk )) {
             printError(MUST_BE_DOT, *t_iter);
             return -EXIT_FAILURE;
         }
@@ -236,8 +239,6 @@ int Syntax::expressionParse(lex_it& t_iter) {
     case id_tk: {
         if (!isVarExist(iter->GetName()))
             printError(UNKNOWN_ID, *t_iter);
-        if (isVarDuplicate(iter->GetName()))
-            printError(DUPL_ID_ERR, *t_iter);
     }
     case constant_tk: { // like a := 3 ...
         iter = getNextLex(t_iter);
@@ -265,6 +266,7 @@ int Syntax::expressionParse(lex_it& t_iter) {
 }
 
 void Syntax::printError(errors t_err, Lexem lex) {
+    error = true;
     switch (t_err) {
     case UNKNOWN_LEXEM: {
         std::cerr << "<E> Lexer: Get unknown lexem '" << lex.GetName()
@@ -327,14 +329,6 @@ bool Syntax::checkLexem(const lex_it& t_iter, const tokens& t_tok) {
 bool Syntax::isVarExist(const std::string& t_var_name) {
     auto map_iter = id_map.find(t_var_name);
     return !(map_iter == id_map.end());
-}
-
-bool Syntax::isVarDuplicate(const std::string& t_var_name) {
-    auto map_iter = id_map.find(t_var_name);
-    if (map_iter == id_map.end()) {
-        return 0;
-    }
-    else return 1;
 }
 
 void Syntax::updateVarTypes(const std::list<std::string>& t_var_list, const std::string& t_type_name) {
