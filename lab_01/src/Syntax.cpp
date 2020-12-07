@@ -21,7 +21,7 @@ int Syntax::ParseCode() {
     if (programParse(it) != 0)
         return -EXIT_FAILURE;
 
-    while (it != lex_table.end() && it->GetToken() != dot_tk)
+    while (it != lex_table.end() && it->GetToken() != eof_tk)
         blockParse(it);
     std::cout << "EOF" << std::endl;
 
@@ -197,18 +197,18 @@ int Syntax::stateParse(lex_it& t_iter, int c_count) {
     }
     case begin_tk: {
         compoundParse(t_iter, c_count);
-        getNextLex(t_iter);
-        if (!checkLexem(t_iter, semi_tk)) {
+        if (!checkLexem(peekLex(1, t_iter), semi_tk)) {
             printError(MUST_BE_SEMI, *t_iter);
             return -EXIT_FAILURE;
         }
+        else getNextLex(t_iter);
+
         break;
     }
     default: {
         break;
     }
     }
-
     return EXIT_SUCCESS;
 }
 
@@ -220,16 +220,20 @@ int Syntax::compoundParse(lex_it& t_iter, int c_count) {
             printError(EOF_ERR, *t_iter);
             return -EXIT_FAILURE;
         }
-        stateParse(t_iter, c_count);
+        if (t_iter->GetToken() != dot_tk)
+        {
+            stateParse(t_iter, c_count);
+        }
+        else break;
+        //stateParse(t_iter, c_count);
     }
-
-    if (c_count == 1) { 
-        if (!checkLexem(peekLex(1, t_iter), dot_tk )) {
+    
+    if (c_count == 1) {
+        if (!checkLexem(peekLex(1, t_iter), dot_tk)) {
             printError(MUST_BE_DOT, *t_iter);
             return -EXIT_FAILURE;
         }
     }
-
     return EXIT_SUCCESS;
 }
 

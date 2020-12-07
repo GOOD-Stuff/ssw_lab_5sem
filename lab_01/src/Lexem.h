@@ -20,6 +20,8 @@ enum tokens {
     ass_tk,             // ':='
     plus_tk,            // '+'
     minus_tk,           // '-'
+    div_tk,             // 'div'
+    mod_tk,             // 'mod'
     eof_tk              // 'end of file' token
 };
 
@@ -44,11 +46,11 @@ class Lexem
 {
 public:
     Lexem() = default;
-    Lexem(std::string t_name, tokens token_tk, int t_line) : name(t_name), token(token_tk), line(t_line) {};
+    Lexem(const std::string &t_name, tokens token_tk, int t_line) : name(t_name), token(token_tk), line(t_line) {};
 
-    int             GetLine() { return line; }
-    tokens          GetToken() { return token; }
-    std::string     GetName() { return name; }
+    int                 GetLine() { return line; }
+    tokens              GetToken() { return token; }
+    const std::string&  GetName() { return name; }
 
 private:
     std::string     name{ "" };
@@ -58,5 +60,4 @@ private:
 
 
 #endif // !LEXEM_H
-
 
