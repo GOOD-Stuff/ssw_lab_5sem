@@ -38,7 +38,7 @@ Lexem Lexer::GetLex() {
         while (ch == -1 || ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t') {
             if (ch == '\n') line++;
 
-            if (code.eof()) // if end of files
+            if (code.eof()) // if end of file
                 return Lexem("EOF", eof_tk, line);
             ch = GetChar();
         }
@@ -56,7 +56,8 @@ Lexem Lexer::GetLex() {
             }
 
             return Lexem(std::move(lex), constant_tk, line);
-        } else if (std::isalpha(static_cast<unsigned char>(ch))) { // Identificators
+        } 
+        else if (std::isalpha(static_cast<unsigned char>(ch))) { // Identificators
             while(isId(ch)) {
                 lex += ch;
                 ch = GetChar();
@@ -72,7 +73,7 @@ Lexem Lexer::GetLex() {
             }
         }
         else if (std::ispunct(static_cast<unsigned char>(ch))) { // Other symbols
-            tokens tok;
+            Tokens tok;
             switch (ch) {
                 case ',' : tok = comma_tk; break;
                 case '.' : tok = dot_tk;   break;
@@ -83,6 +84,8 @@ Lexem Lexer::GetLex() {
                 case '-' : tok = sub_tk;   break;
                 case '*' : tok = mul_tk;   break;
                 case '/' : tok = div_tk;   break; // TODO: rewrite for Pascal div
+                //case 'd' : tok = div_tk;   break; // TODO: rewrite for Pascal div
+                //case 'mod' : tok = div_tk;   break; // TODO: rewrite for Pascal div
                 default: {
                     std::cerr << "<E> Unknown token " << ch << std::endl;
                     tok = unknown_tk;
