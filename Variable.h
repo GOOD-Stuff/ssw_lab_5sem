@@ -1,7 +1,3 @@
-//
-// Created by vovan on 29.09.2019.
-//
-
 #ifndef LECS_PARS_VARIABLE_H
 #define LECS_PARS_VARIABLE_H
 
