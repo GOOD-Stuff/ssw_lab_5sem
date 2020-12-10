@@ -3,10 +3,10 @@
 Syntax::Syntax(std::vector<Lexem> &&t_lex_table) {
     if (t_lex_table.empty())
         throw std::runtime_error("<E> Syntax: Lexemes table is empty");
-    if (t_lex_table.at(0).GetToken() == eof_tk)
-        throw std::runtime_error("<E> Syntax: Code file is empty");
-    lex_table = t_lex_table;
-    cursor    = lex_table.begin();
+    if ((t_lex_table.at(0).GetToken() == program_tk)) { //eof_tk -> program_tk
+        lex_table = t_lex_table;
+        cursor = lex_table.begin();
+    } else throw std::runtime_error("<E> Syntax: Code file is empty");
 }
 
 Syntax::~Syntax() {
@@ -19,8 +19,12 @@ int Syntax::ParseCode() {
     if (programParse(it) != 0)
         return -EXIT_FAILURE;
 
+    //while(it != lex_table.end() && it->GetToken() != eof_tk && it->GetToken() != dot_tk)
     while(it != lex_table.end() && it->GetToken() != eof_tk)
         blockParse(it);
+    /*if (it->GetToken() == dot_tk) {
+        std::cout << "Program was parse successfully" << std::endl;
+    }*/
     std::cout << "EOF" << std::endl;
 
     return EXIT_SUCCESS;
@@ -35,6 +39,7 @@ Syntax::lex_it Syntax::getNextLex(lex_it &iter) {
         std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
                   << exp.what() << std::endl;
     }
+    return iter;
 }
 
 Syntax::lex_it Syntax::peekLex(int N, lex_it t_iter) {
@@ -105,7 +110,17 @@ int Syntax::blockParse(lex_it &t_iter) {
                 break;
             }
             case dot_tk: {
-                std::cout << "Program was parse successfully" << std::endl;
+                //std::cout << "Program was parse successfully" << std::endl;
+
+                if ((t_iter - 1)->GetToken() == end_tk) {
+                    std::cout << "Program was parse successfully" << std::endl;
+                    while (t_iter != lex_table.end() && t_iter->GetToken() != eof_tk)
+                        getNextLex(t_iter);
+                }
+                else {
+                    printError(EOF_ERR, *t_iter);
+                }
+                
                 break;
             }
             default: {
@@ -121,28 +136,30 @@ int Syntax::blockParse(lex_it &t_iter) {
     return EXIT_SUCCESS;
 }
 
-int Syntax::vardpParse(Syntax::lex_it &t_iter, tree_t *t_tree) {
+int Syntax::vardpParse(Syntax::lex_it &t_iter) {
     // var_list contains list of variables from current code line
-    auto var_list = vardParse(t_iter);
-    if (!checkLexem(t_iter, ddt_tk)) {
-        printError(MUST_BE_COMMA, *t_iter);
+    while ((t_iter+1)->GetToken() == id_tk) { 
+        auto var_list = vardParse(t_iter);
+
+        if (!checkLexem(t_iter, ddt_tk)) {
+            printError(MUST_BE_COMMA, *t_iter);
+        }
+
+        auto type_iter = getNextLex(t_iter);
+        if (!checkLexem(t_iter, type_tk)) {
+            printError(MUST_BE_TYPE, *t_iter);
+        }
+
+        getNextLex(t_iter);
+        if (!checkLexem(t_iter, semi_tk)) {
+            printError(MUST_BE_SEMI, *t_iter);
+        }
+
+        updateVarTypes(var_list, type_iter->GetName());
+
+        //buildVarTree(var_list, t_tree);
+
     }
-
-    auto type_iter = getNextLex(t_iter);
-    if (!checkLexem(t_iter, type_tk)) {
-        printError(MUST_BE_TYPE, *t_iter);
-    }
-
-    getNextLex(t_iter);
-    if (!checkLexem(t_iter, semi_tk)) {
-        printError(MUST_BE_SEMI, *t_iter);
-    }
-
-    updateVarTypes(var_list, type_iter->GetName());
-    //buildVarTree(var_list, t_tree);
-
-
-
     return EXIT_SUCCESS;
 }
 
@@ -251,7 +268,7 @@ int Syntax::expressionParse(lex_it &t_iter) {
                     //        build_tree(...)
                     //    }
                     // }
-                    // expressionParse(...) // look deeper
+                    // expressionParse(...) // rslook deeper
                     expressionParse(t_iter);
                     break;
                 }
@@ -330,7 +347,7 @@ void Syntax::printError(errors t_err, Lexem lex) {
 }
 
 
-bool Syntax::checkLexem(const Syntax::lex_it &t_iter, const tokens &t_tok) {
+bool Syntax::checkLexem(const Syntax::lex_it &t_iter, const Tokens &t_tok) {
     if (t_iter == lex_table.end())   return false;
     if (t_iter->GetToken() != t_tok) return false;
 
@@ -342,21 +359,14 @@ bool Syntax::isVarExist(const std::string &t_var_name) {
     auto map_iter = id_map.find(t_var_name);
     return !(map_iter == id_map.end());
 }
-bool Syntax::isVarCopy(const std::string &t_var_name) {
-    auto map_iter = id_map.find(t_var_name);
-  if (map_iter == id_map.end()){
-      return 0;
-  }
-   else  return 1;
-}
+
 
 void Syntax::updateVarTypes(const std::list<std::string> &t_var_list,const std::string &t_type_name) {
     try {
-        for (auto &el: t_var_list)
+        for (auto& el : t_var_list)
             id_map.at(el).type = t_type_name;
     } catch (const std::exception &exp) {
         std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
                   << exp.what() << std::endl;
     }
 }
-
