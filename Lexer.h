@@ -1,9 +1,5 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef LECS_PARS_LEXER_H
+#define LECS_PARS_LEXER_H
 
 #include <fstream>
 #include <iostream>
@@ -17,14 +13,14 @@ public:
     ~Lexer();
 private:
     std::ifstream code;
-    char cursor { -1 };
-    int line { 1 };
+    char cursor {-1};
+    int line {1};
     std::vector<Lexem> lex_table;
 
     Lexem GetLex();
     char GetChar();
 
-    inline char char GetCurrentCurs(){
+    inline char GetCurrentCurs(){
         return cursor;
     }
 };
