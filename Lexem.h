@@ -1,21 +1,16 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
-#ifndef LEXEM_H
-#define LEXEM_H
+#ifndef LECS_PARS_LEXEM_H
+#define LECS_PARS_LEXEM_H
 
 #include <string>
 
-
-enum tokens {
+enum Tokens {
     unknown_tk = -1,    // we get unknown token
     program_tk = 0,     // 'program'
     var_tk,             // 'var'
     begin_tk,           // 'begin'
     end_tk,             // 'end'
     type_tk,            // 'type'
-    id_tk       = 8,    // any [aA-zZ][0-9]
+    id_tk = 8,    // any [aA-zZ][0-9]
     constant_tk = 9,    // 0-9
     dot_tk,             // '.'
     comma_tk,           // ','
@@ -46,30 +41,23 @@ enum errors {
     MUST_BE_ASS,     // Error: Must be ':='
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
-    // TODO: Add other types of error
-};
 
+};
 
 class Lexem {
 public:
     Lexem() = default;
-    Lexem(std::string &&t_name, tokens t_tok, int t_line) : name(t_name),
-                                                            token(t_tok), line(t_line) {};
-    int GetLine(){
-        return line;
-    }
-    tokens GetToken() {
-        return token;
-    }
-    std::string GetName() {
-        return name;
-    }
+    Lexem(std::string &&t_name, Tokens t_tok, int t_line) : name(t_name), token(t_tok), line(t_line) {};
+
+    const std::string& GetName() const;
+    Tokens GetToken() const;
+    int GetLine() const;
+
 private:
-    std::string name{ "" };
-    tokens token{ unknown_tk };
-    int line{ 0 };
+    std::string name{""};
+    Tokens token{ unknown_tk };
+    int line{0};
 };
 
 
-
-#endif //LEXEM_H
+#endif LECS_PARS_LEXEM_H
