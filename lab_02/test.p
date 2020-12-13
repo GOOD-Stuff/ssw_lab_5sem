@@ -1,14 +1,9 @@
-program lab03;
+program lab;
     var
-        b : integer;
-        a, d : integer;
+        e, z : integer;
     begin
         begin
-            a := ((7 + 3) + 23 * 2 - 6 * (3 - 1) + 3)/20;
-        end;
-        begin
-            begin
-                b := -3;
-            end;
-        end;
+            e := (7 + 3 + 23 * 2 - 6 * 3 - 3) / 20;
+        end;    		
+        z := -3;
     end.

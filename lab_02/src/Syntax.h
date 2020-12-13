@@ -37,8 +37,8 @@ private:
     Tree  *simplExprParse            (const lex_it &var_iter, lex_it &t_iter,
                                       Tree *tree, int& mult);
 
-    Tree* stateParse                 (lex_it &t_iter);
-    Tree* compoundParse              (lex_it &t_iter);
+    Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
+    Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
     int   vardpParse                 (lex_it &t_iter, Tree *t_tree);
     std::list<std::string> vardParse (lex_it &t_iter);
     int   blockParse                 (lex_it &t_iter);

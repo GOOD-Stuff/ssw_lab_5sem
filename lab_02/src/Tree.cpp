@@ -74,8 +74,10 @@ void Tree::AddLeftTree(Tree* tree) {
 
 
 void Tree::AddRightTree(Tree* tree) {
+  if (tree != nullptr) {
     tree->parent = this;
     this->right = tree;
+  }
 }
 
 

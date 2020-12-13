@@ -20,11 +20,14 @@
  * <id>          ::= a-z
  * <constant>    ::= 0-9
  */
-Syntax::Syntax(std::vector<Lexem> &&t_lex_table) {
-    if (t_lex_table.empty())
-        throw std::runtime_error("<E> Syntax: Lexemes table is empty");
-    if (t_lex_table.at(0).GetToken() == eof_tk)
-        throw std::runtime_error("<E> Syntax: Code file is empty");
+Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
+  if (t_lex_table.empty())
+    throw std::runtime_error("<E> Syntax: Lexemes table is empty");
+
+  if (t_lex_table.at(0).GetToken() == eof_tk) {
+    printError(MUST_BE_PROG, t_lex_table.at(0));
+    throw std::runtime_error("<E> Syntax: Code file is empty");
+  }
     lex_table = t_lex_table;
     cursor    = lex_table.begin();
 
@@ -136,7 +139,7 @@ int Syntax::blockParse(lex_it &t_iter) {
                 break;
             }
             case begin_tk: {
-                root_tree->AddRightTree(compoundParse(t_iter));
+              root_tree->AddRightTree(compoundParse(t_iter, 0));
                 break;
             }
             case dot_tk: {
@@ -193,7 +196,12 @@ int Syntax::vardpParse(Syntax::lex_it &t_iter, Tree *t_tree) {
         if (checkLexem(forwrd_lex, var_tk))
             getNextLex(t_iter);
         vardpParse(t_iter, t_tree->GetRightNode());
+
+    } else if (forwrd_lex->GetToken() != begin_tk) {
+      printError(MUST_BE_ID, *forwrd_lex);
+
     } else {
+        if(t_tree->GetRightNode()->GetRightNode())
         t_tree->GetRightNode()->FreeRightNode();
     }
 
@@ -242,8 +250,7 @@ std::list<std::string> Syntax::vardParse(lex_it &t_iter) {
  * @return  EXIT_SUCCESS - if compound part is matched to grammar
  * @return -EXIT_FAILURE - if compound part doesn't matched to grammar
  */
-Tree *Syntax::compoundParse(lex_it &t_iter) {
-    static int compound_count = 0; // XXX: How can this be replaced?
+Tree *Syntax::compoundParse(lex_it &t_iter, int compound_count) {
     compound_count++;
     int local_lvl = compound_count; // save current compound level
     int sec_prm   = 0;
@@ -267,7 +274,7 @@ Tree *Syntax::compoundParse(lex_it &t_iter) {
             return nullptr;
         }
 
-        auto *subTree = stateParse(t_iter);
+        auto *subTree = stateParse(t_iter, compound_count);
         if (subTree != nullptr) {
             tree->AddRightNode(label(), 0);
             tree->GetRightNode()->AddLeftTree(subTree);
@@ -276,6 +283,7 @@ Tree *Syntax::compoundParse(lex_it &t_iter) {
             if (!is_end()) sec_prm++;
         }
     }
+
 
     if (compound_count == 1) { // XXX: How can this be replaced?
         if (checkLexem(peekLex(1, t_iter), unknown_tk) ||
@@ -299,7 +307,7 @@ Tree *Syntax::compoundParse(lex_it &t_iter) {
  * @return  EXIT_SUCCESS - if state part is matched to grammar
  * @return -EXIT_FAILURE - if state part doesn't matched to grammar
  */
-Tree* Syntax::stateParse(lex_it &t_iter) {
+Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
     Tree *result_tree = nullptr;
     auto iter = getNextLex(t_iter);
     switch (iter->GetToken()) {
@@ -330,7 +338,7 @@ Tree* Syntax::stateParse(lex_it &t_iter) {
             break;
         }
         case begin_tk: {
-            auto *tree_comp = compoundParse(t_iter);
+            auto *tree_comp = compoundParse(t_iter, compound_count_f);
             getNextLex(t_iter);
             if (!checkLexem(t_iter, semi_tk)) {
                 printError(MUST_BE_SEMI, *t_iter);
@@ -378,11 +386,14 @@ int Syntax::expressionParse(lex_it &t_iter, Tree *tree, int& mult) {
             printError(MUST_BE_ID, *t_iter);
             return -EXIT_FAILURE;
           }
-            t_iter->RenameLex("-" + t_iter->GetName());
-            var_iter = t_iter;
-
-            subTree = simplExprParse(var_iter, t_iter, tree, mult);
-            break;      
+          var_iter = getPrevLex(t_iter);
+          getPrevLex(var_iter);
+          auto lex_0 = Lexem("0", constant_tk, iter->GetLine());
+          lex_table.emplace(t_iter, lex_0);
+          t_iter = var_iter;
+          var_iter = getNextLex(t_iter);
+          subTree = simplExprParse(var_iter, t_iter, tree, mult);
+          break;      
         }
         case opb_tk: { // like a := ( ... );
             mult += 3;

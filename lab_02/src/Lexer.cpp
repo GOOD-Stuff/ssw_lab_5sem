@@ -37,6 +37,11 @@ std::vector<Lexem> Lexer::ScanCode() {
             lex_table.emplace_back(getLex());
         }
 
+        if (lex_table.back().GetToken() != eof_tk) {
+          auto eof_lex = Lexem("EOF", eof_tk, lex_table.back().GetLine() + 1);
+          lex_table.emplace_back(eof_lex);
+        }
+
         return lex_table;
     } catch (const std::exception &exp) {
         std::cerr << "<E> Catch exception in " << __func__ << ": " << exp.what() << std::endl;
@@ -61,6 +66,7 @@ Lexem Lexer::getLex() {
                 return Lexem("EOF", eof_tk, line);
             ch = getChar();
         }
+
 
         auto isId = [](char ch) {
             return std::isalpha(static_cast<unsigned char>(ch)) ||
