@@ -35,6 +35,8 @@ Syntax::Syntax(std::vector<Lexem> &&t_lex_table) {
 
     operations.emplace("*",   3);
     operations.emplace("/",   3);
+    operations.emplace("div", 3);
+    operations.emplace("mod", 3);
 }
 
 

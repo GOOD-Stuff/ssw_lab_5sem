@@ -7,7 +7,7 @@
  *
  * @return name of lexeme
  */
-std::string Lexem::GetName() {
+const std::string Lexem::GetName() {
     return name;
 }
 
@@ -18,7 +18,7 @@ std::string Lexem::GetName() {
  *
  * @return type (token) of lexeme
  */
-tokens Lexem::GetToken() {
+tokens Lexem::GetToken() const {
     return token;
 }
 

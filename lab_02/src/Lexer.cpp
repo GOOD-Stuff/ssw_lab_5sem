@@ -5,9 +5,10 @@ Lexer::Lexer(const char *file_path) {
     try {
         code.open(file_path);
     } catch (const std::exception &exp) {
-        std::string what;
+      std::string what{"<E> Lexer: Catch exception in constructor: "};
+      ;
         std::string lel(exp.what());
-        what = "<E> Lexer: Catch exception in constructor: ";
+
 
         throw std::runtime_error(what + lel);
     }
@@ -102,8 +103,10 @@ Lexem Lexer::getLex() {
                 case '-' : tok = sub_tk;   break;
                 case '*' : tok = mul_tk;   break;
                 case '/' : tok = div_tk;   break;
-                case '(': tok = opb_tk;   break;
-                case ')': tok = cpb_tk;   break;
+                case '(': tok = opb_tk;     break;
+                case ')': tok = cpb_tk;       break;
+                case 'div': tok = div_op_tk;   break;
+                case 'mod': tok = mod_op_tk;   break;
 
                 default: {
                     std::cerr << "<E> Unknown token " << ch << std::endl;
