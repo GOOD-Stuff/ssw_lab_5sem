@@ -5,9 +5,10 @@ Lexer::Lexer(const char *file_path) {
     try {
         code.open(file_path);
     } catch (const std::exception &exp) {
-        std::string what;
+      std::string what{"<E> Lexer: Catch exception in constructor: "};
+      ;
         std::string lel(exp.what());
-        what = "<E> Lexer: Catch exception in constructor: ";
+
 
         throw std::runtime_error(what + lel);
     }
@@ -36,6 +37,11 @@ std::vector<Lexem> Lexer::ScanCode() {
             lex_table.emplace_back(getLex());
         }
 
+        if (lex_table.back().GetToken() != eof_tk) {
+          auto eof_lex = Lexem("EOF", eof_tk, lex_table.back().GetLine() + 1);
+          lex_table.emplace_back(eof_lex);
+        }
+
         return lex_table;
     } catch (const std::exception &exp) {
         std::cerr << "<E> Catch exception in " << __func__ << ": " << exp.what() << std::endl;
@@ -60,6 +66,7 @@ Lexem Lexer::getLex() {
                 return Lexem("EOF", eof_tk, line);
             ch = getChar();
         }
+
 
         auto isId = [](char ch) {
             return std::isalpha(static_cast<unsigned char>(ch)) ||
@@ -86,7 +93,21 @@ Lexem Lexer::getLex() {
             else if (lex == "var")     { return Lexem(std::move(lex), var_tk, line);     }
             else if (lex == "begin")   { return Lexem(std::move(lex), begin_tk, line);   }
             else if (lex == "integer") { return Lexem(std::move(lex), type_tk, line);    }
-            else if (lex == "end")     { return Lexem(std::move(lex), end_tk, line);     }
+            else if (lex == "boolean") { return Lexem(std::move(lex), type_tk, line);    }
+            else if (lex == "end")     { return Lexem(std::move(lex), end_tk, line);     } 
+            else if (lex == "mod")     { return Lexem(std::move(lex), mod_op_tk, line);     }
+            else if (lex == "div")     { return Lexem(std::move(lex), div_op_tk, line);     }
+            else if (lex == "if")     { return Lexem(std::move(lex), if_tk, line);     }
+            else if (lex == "true")     { return Lexem(std::move(lex), true_tk, line);     }
+            else if (lex == "false")     { return Lexem(std::move(lex), false_tk, line);     }
+            else if (lex == "while")     { return Lexem(std::move(lex), while_tk, line);     }
+            else if (lex == "for")     { return Lexem(std::move(lex), for_tk, line);     }
+            else if (lex == "and")     { return Lexem(std::move(lex), and_tk, line);     }
+            else if (lex == "or")     { return Lexem(std::move(lex), or_tk, line);     }
+            else if (lex == "xor")     { return Lexem(std::move(lex), xor_tk, line);     }
+            else if (lex == "then")     { return Lexem(std::move(lex), then_tk, line);     }
+            else if (lex == "else")     { return Lexem(std::move(lex), else_tk, line);     }
+
             else { // it is ID
                 return Lexem(std::move(lex), id_tk, line);
             }
@@ -102,6 +123,9 @@ Lexem Lexer::getLex() {
                 case '-' : tok = sub_tk;   break;
                 case '*' : tok = mul_tk;   break;
                 case '/' : tok = div_tk;   break;
+                case '(': tok = opb_tk;     break;
+                case ')': tok = cpb_tk;       break;
+
                 default: {
                     std::cerr << "<E> Unknown token " << ch << std::endl;
                     tok = unknown_tk;

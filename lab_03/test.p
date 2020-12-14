@@ -1,14 +1,13 @@
-program lab03;
+program lab;
     var
-        b : integer;
-        a, d : integer;
+        e, z : integer;
+        k, t : boolean;
     begin
         begin
-            a := 23 + 2 * 3 - 1;
-        end;
-        begin
+            k := 7;
             begin
-                b := 3;
+                e := 0;
             end;
-        end;
+        end;      
+        z := -3;
     end.

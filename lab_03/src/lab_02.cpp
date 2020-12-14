@@ -1,4 +1,4 @@
-#include "lab_03.h"
+#include "lab_02.h"
 
 
 /**
@@ -35,7 +35,7 @@
  */
 
 
-int Parse3(const std::string& file_path) {
+int Parse(const std::string& file_path) {
     Lexer lex(file_path.c_str());
     auto table = lex.ScanCode();
 

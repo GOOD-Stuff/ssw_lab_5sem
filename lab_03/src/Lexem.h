@@ -25,6 +25,18 @@ enum tokens {
     div_tk,             // '/'
     opb_tk,             // '('
     cpb_tk,             // ')'
+    div_op_tk,          // 'div'
+    mod_op_tk,          // 'mod'
+    if_tk,
+    then_tk,
+    else_tk,
+    true_tk,
+    false_tk,
+    while_tk,
+    for_tk,
+    or_tk,
+    and_tk,
+    xor_tk,
 
     eof_tk              // end of file
 };
@@ -40,6 +52,8 @@ enum errors {
     MUST_BE_TYPE,    // Error: Must be type of identifier
     MUST_BE_DOT,     // Error: Must be '.'
     MUST_BE_ASS,     // Error: Must be ':='
+    MUST_BE_BKT_END, // Error: Must be ')'
+    MUST_BE_BKT_BGN, // Error: Must be '('
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
 };
@@ -49,11 +63,13 @@ class Lexem {
 public:
     Lexem() : name(""), token(unknown_tk), line(0) {};
     Lexem(std::string &&t_name, tokens t_tok, int t_line) : name(t_name),
-                                              token(t_tok), line(t_line) {};
+                                              token(t_tok), line(t_line){};
 
-    std::string GetName();
-    tokens      GetToken();
+    const std::string GetName();
+    tokens      GetToken() const;
     int         GetLine();
+    void        RenameLex(std::string name_);
+
 private:
     std::string name;
     tokens      token;
