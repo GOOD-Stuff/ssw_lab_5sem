@@ -380,20 +380,15 @@ int Syntax::expressionParse(lex_it &t_iter, Tree *tree, int& mult) {
             subTree  = simplExprParse(var_iter, t_iter, tree, mult);
             break;
         }
-        case sub_tk: { // like a := -3;
-
-          if (getNextLex(t_iter)->GetToken() != constant_tk) {
-            printError(MUST_BE_ID, *t_iter);
-            return -EXIT_FAILURE;
-          }
-          var_iter = getPrevLex(t_iter);
-          getPrevLex(var_iter);
-          auto lex_0 = Lexem("0", constant_tk, iter->GetLine());
-          lex_table.emplace(t_iter, lex_0);
-          t_iter = var_iter;
-          var_iter = getNextLex(t_iter);
-          subTree = simplExprParse(var_iter, t_iter, tree, mult);
-          break;      
+        case sub_tk: {  // like a := -3;
+          var_iter = t_iter;
+          tree->AddRightNode(var_iter->GetName());
+          tree->GetRightNode()->AddLeftNode("0");
+          getNextLex(var_iter);
+          subTree =
+              simplExprParse(var_iter, t_iter, tree->GetRightNode(), mult);
+          getNextLex(t_iter);
+          break;
         }
         case opb_tk: { // like a := ( ... );
             mult += 3;
