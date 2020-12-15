@@ -33,11 +33,16 @@ enum tokens {
     true_tk,
     false_tk,
     while_tk,
+    do_tk,
     for_tk,
+    to_tk,
     or_tk,
     and_tk,
     xor_tk,
-
+    array_tk, 
+    of_tk,
+    sqbrleft_tk,
+    sqbrright_tk,
     eof_tk              // end of file
 };
 
@@ -54,6 +59,12 @@ enum errors {
     MUST_BE_ASS,     // Error: Must be ':='
     MUST_BE_BKT_END, // Error: Must be ')'
     MUST_BE_BKT_BGN, // Error: Must be '('
+    MUST_BE_THEN, 
+    MUST_BE_DO,
+    MUST_BE_TO,
+    MUST_BE_OF,
+    MUST_BE_SQBRLEFT,
+    MUST_BE_SQBRRIGHT,
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
 };

@@ -106,7 +106,11 @@ Lexem Lexer::getLex() {
             else if (lex == "or")     { return Lexem(std::move(lex), or_tk, line);     }
             else if (lex == "xor")     { return Lexem(std::move(lex), xor_tk, line);     }
             else if (lex == "then")     { return Lexem(std::move(lex), then_tk, line);     }
+            else if (lex == "do") { return Lexem(std::move(lex), do_tk, line); }
+            else if (lex == "to") { return Lexem(std::move(lex), to_tk, line); }
             else if (lex == "else")     { return Lexem(std::move(lex), else_tk, line);     }
+            else if (lex == "array") { return Lexem(std::move(lex), array_tk, line); }
+            else if (lex == "of") { return Lexem(std::move(lex), of_tk, line); }
 
             else { // it is ID
                 return Lexem(std::move(lex), id_tk, line);
@@ -123,8 +127,10 @@ Lexem Lexer::getLex() {
                 case '-' : tok = sub_tk;   break;
                 case '*' : tok = mul_tk;   break;
                 case '/' : tok = div_tk;   break;
-                case '(': tok = opb_tk;     break;
+                case '(': tok = opb_tk;       break;
                 case ')': tok = cpb_tk;       break;
+                case '[': tok = sqbrleft_tk;  break;
+                case ']': tok = sqbrright_tk; break;
 
                 default: {
                     std::cerr << "<E> Unknown token " << ch << std::endl;
