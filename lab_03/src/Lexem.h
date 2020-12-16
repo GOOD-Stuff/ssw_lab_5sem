@@ -22,27 +22,25 @@ enum tokens {
     add_tk,             // '+'
     sub_tk,             // '-'
     mul_tk,             // '*'
-    div_tk,             // '/'
     opb_tk,             // '('
     cpb_tk,             // ')'
     div_op_tk,          // 'div'
-    mod_op_tk,          // 'mod'
-    if_tk,
-    then_tk,
-    else_tk,
-    true_tk,
-    false_tk,
-    while_tk,
-    do_tk,
-    for_tk,
-    to_tk,
-    or_tk,
-    and_tk,
-    xor_tk,
-    array_tk, 
-    of_tk,
-    sqbrleft_tk,
-    sqbrright_tk,
+    if_tk,              // 'if'
+    then_tk,            // 'then'
+    else_tk,            // 'else'
+    true_tk,            // 'true'
+    false_tk,           // 'false'
+    while_tk,           // 'while'
+    do_tk,              // 'do'
+    for_tk,             // 'for'
+    to_tk,              // 'to'
+    or_tk,              // 'or'
+    and_tk,             // 'and'
+    xor_tk,             // 'xor'
+    array_tk,           // 'array'
+    of_tk,              // 'of'
+    sqbrleft_tk,        // '['
+    sqbrright_tk,       // ']'
     eof_tk              // end of file
 };
 
@@ -59,14 +57,15 @@ enum errors {
     MUST_BE_ASS,     // Error: Must be ':='
     MUST_BE_BKT_END, // Error: Must be ')'
     MUST_BE_BKT_BGN, // Error: Must be '('
-    MUST_BE_THEN, 
-    MUST_BE_DO,
-    MUST_BE_TO,
-    MUST_BE_OF,
-    MUST_BE_SQBRLEFT,
-    MUST_BE_SQBRRIGHT,
+    MUST_BE_THEN,    // Error: Must be 'then'
+    MUST_BE_DO,      // Error: Must be 'do'
+    MUST_BE_TO,      // Error: Must be 'to'
+    MUST_BE_OF,      // Error: Must be 'of'
+    MUST_BE_SQBRLEFT,   // Error: Must be '['
+    MUST_BE_SQBRRIGHT,  // Error: Must be ']'
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
+    INCOMP_TYPES,    // Error: Incompatible types
 };
 
 
@@ -74,7 +73,7 @@ class Lexem {
 public:
     Lexem() : name(""), token(unknown_tk), line(0) {};
     Lexem(std::string &&t_name, tokens t_tok, int t_line) : name(t_name),
-                                              token(t_tok), line(t_line){};
+        token(t_tok), line(t_line) {};
 
     const std::string GetName();
     tokens      GetToken() const;

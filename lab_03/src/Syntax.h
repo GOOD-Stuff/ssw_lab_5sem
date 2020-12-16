@@ -50,6 +50,8 @@ private:
     void updateVarTypes(const std::list<std::string> &t_var_list,
                         const std::string &t_type_name);
     void buildVarTree  (const std::list<std::string> &t_var_list, Tree *t_tree);
+    void buildVarTree  (const std::list<std::string>& t_var_list, Tree* t_tree,
+                        Tree* array_tree);
 
     void createVarTree(Tree *t_tree, Tree *t_donor_tree, int lvl);
     Tree* createLowestOpTree(Tree *t_parent_tree, std::string value, int priority_);

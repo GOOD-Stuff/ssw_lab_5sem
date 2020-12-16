@@ -34,9 +34,9 @@ int Lexem::GetLine() {
 }
 
 /**
- * @brief Rename lexem 
+ * @brief Rename lexem
  * @param[in] name_ - new name
- * 
+ *
  * @return none
 */
 void Lexem::RenameLex(std::string name_) {

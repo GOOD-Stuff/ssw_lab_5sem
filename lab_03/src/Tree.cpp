@@ -22,7 +22,7 @@ void Tree::SetPriority(int priority_) {
 
 /**
  * @brief Get the priority of the operation
- * 
+ *
  * @return Priority of the operation
 */
 int Tree::GetPriority() {
@@ -32,8 +32,8 @@ int Tree::GetPriority() {
 
 /**
  * @brief Add left the Node in Tree
- * @param[in] val - value 
- * 
+ * @param[in] val - value
+ *
  * @param priority_ - The priority of the operation
 */
 void Tree::AddLeftNode(const std::string& val, int priority_) {
@@ -54,7 +54,7 @@ void Tree::AddRightNode(const std::string& val) {
 
 /**
  * @brief Get left Node of Tree
- * 
+ *
  * @return Node of Tree
 */
 Tree* Tree::GetLeftNode() const {
@@ -64,7 +64,7 @@ Tree* Tree::GetLeftNode() const {
 /**
  * @brief Add left Tree in global tree
  * @param[inout] tree - left tree for add
- * 
+ *
  * @return none
 */
 void Tree::AddLeftTree(Tree* tree) {
@@ -74,17 +74,17 @@ void Tree::AddLeftTree(Tree* tree) {
 
 
 void Tree::AddRightTree(Tree* tree) {
-  if (tree != nullptr) {
-    tree->parent = this;
-    this->right = tree;
-  }
+    if (tree != nullptr) {
+        tree->parent = this;
+        this->right = tree;
+    }
 }
 
 
 /**
  * @brief Change Value Node of Tree
  * @param[in] val - new value
- * 
+ *
  * @return none
 */
 void Tree::ChangeValue(const std::string& val) {
@@ -94,8 +94,8 @@ void Tree::ChangeValue(const std::string& val) {
 
 /**
  * @brief Get right Node of Tree
- * 
- * @return Right Node 
+ *
+ * @return Right Node
 */
 Tree* Tree::GetRightNode() const {
     return this->right;
@@ -104,8 +104,8 @@ Tree* Tree::GetRightNode() const {
 
 /**
  * @brief Get Parent Node
- * 
- * @return Parent Node 
+ *
+ * @return Parent Node
 */
 Tree* Tree::GetParentNode() const {
     return this->parent;
@@ -120,27 +120,33 @@ std::string Tree::GetValue() {
 /**
  * @brief Print full Tree
  * @param[in] tab - tabulation for correct out Tree
- * 
+ *
  * @return none
 */
 void Tree::PrintTree(int tab) {
     for (auto i = 0; i < tab; i++) {
         std::cout << "    ";
     }
+
     std::cout << this->value << std::endl;
 
-    if (this->left != nullptr) { this->left->PrintTree(tab + 1); }
-    else {
+    if (this->left != nullptr) {
+        this->left->PrintTree(tab + 1);
+    } else {
         for (auto i = 0; i < tab + 1; i++) {
             std::cout << "    ";
         }
+
         std::cout << "NULL" << std::endl;
     };
-    if (this->right != nullptr) { this->right->PrintTree(tab + 1); }
-    else {
+
+    if (this->right != nullptr) {
+        this->right->PrintTree(tab + 1);
+    } else {
         for (auto i = 0; i < tab + 1; i++) {
             std::cout << "    ";
         }
+
         std::cout << "NULL" << std::endl;
     }
 }
@@ -198,25 +204,28 @@ void Tree::FreeRightNode() {
 
 /**
  * @brief Delete tree
- * 
+ *
  * @param[inout] t_tree - Tree
 */
-void Tree::FreeTree(Tree*& t_tree){
+void Tree::FreeTree(Tree*& t_tree) {
     try {
         if (t_tree->left != nullptr) FreeTree(t_tree->left);
+
         if (t_tree->right != nullptr) FreeTree(t_tree->right);
+
         delete t_tree;
         t_tree = nullptr;
-    }
-    catch (const std::exception& exp) {
+    } catch (const std::exception& exp) {
         std::cerr << "<E> Tree: Catch exception in " << __func__ << ": "
-            << exp.what() << std::endl;
+                  << exp.what() << std::endl;
     }
 }
 
 void Tree::FreeTree() {
     if (this->left != nullptr) this->left->FreeTree();
+
     if (this->right != nullptr) this->right->FreeTree();
+
     parent = nullptr;
     value = "";
     alloc = false;

@@ -6,7 +6,7 @@
 class Variable {
 public:
     explicit Variable(std::string t_type, std::string t_value) : type(t_type),
-                                                                 value(t_value) {};
+        value(t_value) {};
     std::string type;
     std::string value;
 };

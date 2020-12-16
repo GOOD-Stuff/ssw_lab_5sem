@@ -4,7 +4,8 @@ program lab;
         k, t : boolean;
         mas : array[1..100] of integer;
     begin
-        for z to e do begin;
+        if (e) then begin
             k := true;
+            e := 10 + e;
         end;
     end.
