@@ -1,35 +1,31 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
-#ifndef LECS_PARS_LEXER_H
-#define LECS_PARS_LEXER_H
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include "Lexem.h"
 
-
-class Lexer {
+class Lexer
+{
 public:
-    explicit Lexer(const char *file_path);
-    std::vector<Lexem> ScanCode();
 
-    ~Lexer();
+	explicit Lexer(const char* file_path);
+	std::vector<Lexem>	ScanCode();
+	~Lexer();
+
 private:
-    std::ifstream      code;
-    char               cursor  { -1 };
-    int                line    { 1 };
-    std::vector<Lexem> lex_table;
+	std::ifstream		code;
+	char				cursor{ -1 };
+	int					line{ 0 };
+	std::vector<Lexem>	lex_table;
 
-    Lexem getLex();
-    char  getChar();
+	Lexem				GetLex();
+	char				GetChar();
 
-    inline char getCurrentCurs() {
-        return cursor;
-    }
+	inline char			GetCurrentCurs() { return cursor; }
+
 };
 
+#endif // !LEXER_H
 
-#endif //LECS_PARS_LEXER_H

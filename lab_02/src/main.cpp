@@ -1,13 +1,10 @@
 #include <iostream>
-#include <regex>
-#include <map>
-#include <string>
-#include "lab_02.h"
+#include "lab_01.h"
 
 
 int main() {
-    std::cout << "Ah, here we go again..." << std::endl;
-    Parse3("test.p");
+	std::cout << "Ah, here we go again" << std::endl;
+	Parse_01("test.p");
 
-    return 0;
+	return 0;
 }
