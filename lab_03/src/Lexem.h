@@ -34,6 +34,7 @@ enum tokens {
     do_tk,              // 'do'
     for_tk,             // 'for'
     to_tk,              // 'to'
+    downto_tk,          // 'downto'
     or_tk,              // 'or'
     and_tk,             // 'and'
     xor_tk,             // 'xor'
@@ -41,6 +42,8 @@ enum tokens {
     of_tk,              // 'of'
     sqbrleft_tk,        // '['
     sqbrright_tk,       // ']'
+    comp_tk,
+
     eof_tk              // end of file
 };
 
@@ -49,6 +52,7 @@ enum errors {
     UNKNOWN_LEXEM,   // Unknown lexeme
     EOF_ERR,         // End of file error
     MUST_BE_ID,      // Error: Must be identifier
+    MUST_BE_CONST,   // Error: Must be const
     MUST_BE_SEMI,    // Error: Must be ';'
     MUST_BE_PROG,    // Error: Must be 'program'
     MUST_BE_COMMA,   // Error: Must be ','
@@ -66,6 +70,7 @@ enum errors {
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
     INCOMP_TYPES,    // Error: Incompatible types
+    OUT_RANGE,       // Error: Out range array
 };
 
 
