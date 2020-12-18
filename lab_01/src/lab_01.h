@@ -1,16 +1,13 @@
-//
-// Created by vldmr on 13.09.19.
-//
-
 #ifndef LECS_PARS_DAY2_H
 #define LECS_PARS_DAY2_H
 
-#include <fstream>      // for ifstream
-#include <iostream>     // for cout/cerr
+#include <fstream>
+#include <iostream>
 #include <list>
 #include <string>
+#include "Lexer.h"
+#include "parser.h"
 
-
-int Parse2(const std::string &file_path);
+int Compile(const std::string& file_path);
 
 #endif //LECS_PARS_DAY2_H
