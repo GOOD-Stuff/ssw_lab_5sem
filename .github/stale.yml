@@ -41,7 +41,7 @@ markComment: >
 # unmarkComment: >
 #   Your comment here.
 
-# Comment to post when closing a stale Issue or Pull Request.
+Comment to post when closing a stale Issue or Pull Request.
 closeComment: >
    This work was closed because You doesn't work on it.
 

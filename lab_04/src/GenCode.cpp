@@ -20,7 +20,7 @@ GenCode::GenCode(Tree &&t_synt_tree) {
 GenCode::~GenCode() {
     code.close();
     clearBuffer();
-    //Tree::FreeTree(synt_tree);
+    Tree::FreeTree(synt_tree);
 }
 
 
@@ -41,7 +41,6 @@ int GenCode::GenerateAsm() {
 
         if (synt_tree->GetLeftNode() != nullptr)
             generateDeclVars();
-
         if (synt_tree->GetRightNode() != nullptr) {
             generateTextPart();
         }
@@ -80,48 +79,62 @@ void GenCode::buildLine(std::string &&code_line) {
 
 
 /**
- * @brief Generate variables declaration for initialized and uninitialized variables
+ * @brief Generate variables declaration
  * @param none
  *
  * @return  EXIT_SUCCESS - generate was successful
  * @return -EXIT_FAILURE - can't generate GAS code
  */
 int GenCode::generateDeclVars() {
-    auto ptr = synt_tree->GetLeftNode();//var
-
-    if (ptr->GetValue() != "var") {
+    if (synt_tree->GetLeftNode()->GetValue() != "var") {
         std::cerr << "<E> GenCode: Can't find declaration of variables" << std::endl;
         return -EXIT_FAILURE;
     }
 
-    while (ptr->GetRightNode()!=nullptr){
-
-        if (ptr->GetLeftNode()->GetLeftNode()!= nullptr){//if initialized variable
-            generateDataVar(ptr->GetLeftNode());
-
-            if (!test_str.str().empty()) { // if we have any initialized variables
-                addLine(DATA_SECT);
-                addLine(test_str.str());
-                clearBuffer();
-            }
-
-        }else{//if uninitialized variable
-
-            generateBssVaar(ptr->GetLeftNode());
-
-            if (!test_str.str().empty()) { // if we have any uninitialized variables
-                addLine(BSS_SECT);
-                addLine(test_str.str());
-                clearBuffer();
-            }
-        }
-
-    ptr = ptr->GetRightNode();
+    generateInitVars(synt_tree->GetLeftNode());
+    if (!test_str.str().empty()) { // if we have any initialized variables
+        addLine(DATA_SECT);
+        addLine(test_str.str());
+        clearBuffer();
     }
 
-    //generateConstVars(synt_tree->GetLeftNode());
+    generateUninitVars(synt_tree->GetLeftNode());
+    if (!test_str.str().empty()) { // if we have any uninitialized variables
+        addLine(BSS_SECT);
+        addLine(test_str.str());
+        clearBuffer();
+    }
+
+    generateConstVars(synt_tree->GetLeftNode());
+
     return EXIT_SUCCESS;
 }
+
+
+/**
+ * @brief Generate GAS code for initialized variables
+ * @param[inout] var_root - pointer to the root of subtree of variables
+ *
+ * @return  EXIT_SUCCESS - section of .data generated successful
+ * @return -EXIT_FAILURE - can't generate .data section, can't find variables
+ * @note Work for code like:
+ *   var a : integer = 5;
+ *       b : integer = 1;
+ *       c : boolean = false;
+ */
+int GenCode::generateInitVars(Tree *var_root) {
+    if (var_root->GetLeftNode() == nullptr) {
+        std::cerr << "<E> GenCode: Can't find any variables" << std::endl;
+        return -EXIT_FAILURE;
+    }
+
+    generateDataVar(var_root->GetLeftNode());
+    if (var_root->GetRightNode() != nullptr)
+        generateInitVars(var_root->GetRightNode());
+
+    return EXIT_SUCCESS;
+}
+
 
 /**
  * @brief Parse tree and generate lines only for initialized variables
@@ -165,6 +178,31 @@ int GenCode::generateDataVar(Tree *node) {
     return EXIT_SUCCESS;
 }
 
+
+/**
+ * @brief Generate GAS code for uninitialized variables
+ * @param[in] var_root - pointer to the root of subtree of variables
+ *
+ * @return  EXIT_SUCCESS - section of .bss generated successful
+ * @return -EXIT_FAILURE - can't generate .bss section
+ * @note Work for code like:
+ *   var a : integer;
+ *       c : boolean;
+ */
+int GenCode::generateUninitVars(Tree *var_root) {
+    if (var_root->GetLeftNode() == nullptr) {
+        std::cerr << "<E> GenCode: Can't find any variables" << std::endl;
+        return -EXIT_FAILURE;
+    }
+
+    generateBssVaar(var_root->GetLeftNode());
+    if (var_root->GetRightNode() != nullptr)
+        generateUninitVars(var_root->GetRightNode());
+
+    return EXIT_SUCCESS;
+}
+
+
 /**
  * @brief Parse tree and generate lines only for uninitialized variables
  * @param[in] node - node of syntax tree with variable
@@ -193,6 +231,7 @@ int GenCode::generateBssVaar(Tree *node) {
 
     std::string type = SPAC_TYPE;
     generateLabel(node->GetValue(), type, val);
+
     return EXIT_SUCCESS;
 }
 
@@ -221,240 +260,20 @@ void GenCode::generateConstVars(Tree *var_root) {
 void GenCode::generateTextPart() {
     addLine(TEXT_SECT);
     addLine(GLOB_SECT);
-    addLine(" ");
     addLine(MAIN_SECT);
-    addLine(" ");
-    std::string str = "xorl %eax, %eax";
-    addLine(str.data());
-    str = "xorl %ebx, %ebx";
-    addLine(str.data());
-    addLine(" ");
 
-
-    if(generateCompound(synt_tree->GetRightNode()->GetRightNode()))
-        std::cerr << "<E> GenCode error in begin/end operation" << std::endl;
-
-
+    generateCompound();
 }
 
 
 /**
  * @brief Generate GAS code for 'begin/end' operator
- * @param[in] Tree* node (*(begin))
- *
- * @return -EXIT_FAILURE/EXIT_SUCCESS
- */
-int GenCode::generateCompound(Tree *node) {
-    try{
-        while (node->GetValue() != "end" && node->GetValue() != "end."){
-
-            if (node->GetValue() == "end" || node->GetValue() == "end.")
-                return EXIT_SUCCESS;
-
-            std::string st = node->GetValue() + ":";//print label
-            addLine(st.data());
-            addLine(" ");
-
-            if (node->GetLeftNode()->GetValue() == "if"){ //operator if
-
-            }else if (node->GetLeftNode()->GetValue() == "goto"){
-                std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
-                addLine(str.data());
-
-            }else if (node->GetLeftNode()->GetValue() == ":="){
-
-                Tree* var;
-                if ((var = checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue())) == nullptr ){//if undefined variable
-                    throw std::out_of_range("undefined variable");
-                }
-
-                if (var->GetRightNode()->GetValue() == "integer"){//int expression
-
-                    if (node->GetLeftNode()->GetRightNode()->GetLeftNode() == nullptr ){// for d:=1 optimization(d:=value)
-
-
-                        std::string str = "movl $" + node->GetLeftNode()->GetRightNode()->GetValue() +
-                                          ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());
-
-                    }else {//for d:= 1+2...(d:=expression)
-
-                        generateExpressions(node->GetLeftNode()->GetRightNode());
-                        std::string str = "popl %eax";
-                        addLine(str.data());
-                        str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());
-                    }
-                }else {//bool expression
-
-                    if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
-                        nullptr) {// for d:=true optimization(d:=value)
-
-                        std::string str = "movb $" + (std::to_string((node->GetLeftNode()->GetRightNode()->GetValue() == "true") ? 1 : 0)) +
-                                          ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());
-                    } else {
-                        generateExpressionsBool(node->GetLeftNode()->GetRightNode());
-                        std::string str = "popb %al";
-                        addLine(str.data());
-                        str = "movb %al, $" + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());}
-                }
-            }else if (node->GetLeftNode()->GetValue() == "begin"){
-
-                if (generateCompound(node->GetLeftNode()->GetRightNode())){
-                    return -EXIT_FAILURE;
-                }
-
-            }else throw std::out_of_range("need some end for begin");
-
-        node = node->GetRightNode();
-        }
-        return EXIT_SUCCESS;
-    }  catch (const std::exception &exp) {
-        std::cerr << "<E> GenCode: Catch exception in " << __func__ << ": "
-                  << exp.what();
-        return -EXIT_FAILURE;
-    }
-}
-
-/**
- * @brief Generate Gas for int expresion
- * @param[in] tree* node (start of expresion)
+ * @param none
  *
  * @return none
- * @note Generation GAS code for :__:= 15 + 12;
- * will be: pushl $15;  movl $12, %eax; popl %ebx; addl %ebx, %eax; pushl %eax;
- * result in stack;
  */
-void GenCode::generateExpressions(Tree *node){
-    if (node->GetRightNode() == nullptr && node->GetLeftNode() == nullptr){
-        if (node->GetParentNode()->GetLeftNode() == node){
-            std::string str = "pushl $" + node->GetValue();
-            addLine(str.data());
-        }else {
-            std::string str = "movl $" + node->GetValue() + ", %eax";
-            addLine(str.data());
-        }
-        return;
-    }
-
-    if (node->GetLeftNode() != nullptr)
-        generateExpressions(node->GetLeftNode());
-
-    if (node->GetRightNode() != nullptr)
-        generateExpressions(node->GetRightNode());
-
-    std::string str = "popl %ebx";
-    addLine(str.data());
-
-    switch (GetOperation(node->GetValue())) {
-        case 1:
-            str = "addl %ebx, %eax";
-            break;
-        case 2:
-            str = "subl  %ebx, %eax";
-            break;
-        case 3:
-            str = "mull  %ebx";
-            break;
-        case 4://Регистры при делении ЧЕЕЕЕк
-            str = "xorl %edx, %edx";
-            addLine(str.data());
-            str = "divl  %ebx";
-            break;
-        default: throw std::out_of_range("invalid operation");
-    }
-    addLine(str.data());
-    str = "pushl %eax";
-    addLine(str.data());
-}
-
-/**
- * @brief Generate Gas for bool expresion
- * @param[in] tree* node (start of expresion)
- *
- * @return none
- * @note Generation GAS code for :__:= false and true;
- * will be: pushb $0    movb $1, %al    popb %bl    andb %bl, %al
-*           pushb %al   popb %al
- * result in stack;
- */
-void GenCode::generateExpressionsBool(Tree *node){
-    if (node->GetRightNode() == nullptr && node->GetLeftNode() == nullptr){
-
-        if (node->GetParentNode()->GetLeftNode() == node){
-
-            std::string str = "pushb $" + std::to_string((node->GetValue() == "true") ? 1 : 0);
-            addLine(str.data());
-
-        }else {
-
-            std::string str = "movb $" + std::to_string((node->GetValue() == "true") ? 1 : 0) + ", %al";
-            addLine(str.data());
-
-        }
-        return;
-    }
-    if (node->GetLeftNode() != nullptr)
-        generateExpressionsBool(node->GetLeftNode());
-
-    if (node->GetRightNode() != nullptr)
-        generateExpressionsBool(node->GetRightNode());
-
-    std::string str = "popb %bl";
-    addLine(str.data());
-
-    switch (GetOperation(node->GetValue())) {
-        case 5:
-            str = "andb %bl, %al";
-            break;
-        case 6:
-            str = "xorb  %bl, %al";
-            break;
-        case 7:
-            str = "orb  %bl, %al";
-            break;
-        default: throw std::out_of_range("invalid operation");
-    }
-    addLine(str.data());
-    str = "pushb %al";
-    addLine(str.data());
-}
-
-/**
- * @brief Converting string operation on int
- * @param[in] str - string with operation
- * @return int number operation ( 1:+; 2:-; 3:*; 4:div; 5:and; 6:xor; 7:or;
- * else exception
- */
-int GenCode::GetOperation (std::string str){
-    if (str == "+") return 1;
-    if (str == "-") return 2;
-    if (str == "*") return 3;
-    if (str == "div") return 4;
-    if (str == "and") return 5;
-    if (str == "xor") return 6;
-    if (str == "or") return 7;
-    else return -1;
-}
-/**
- * @brief Check variable in var
- * @param[in] string variable (name of variable)
- * @return Tree* node if found, else nullptr
- */
-Tree* GenCode::checkVariable(std::string &&variable){
-    auto ptr =synt_tree->GetLeftNode();
-
-    if (ptr == nullptr)
-        return nullptr;
-
-    while (ptr->GetRightNode() != nullptr){
-        if (ptr->GetLeftNode()->GetValue() == variable )
-            return ptr->GetLeftNode();
-        ptr = ptr->GetRightNode();
-    }
-    return nullptr;
+void GenCode::generateCompound() {
+    // TODO: Here add generation for begin/end
 }
 
 
@@ -481,8 +300,6 @@ void GenCode::generateLabel(const std::string &name, const std::string &type,
  * @return none
  */
 void GenCode::generateEnd() {
-    addLine(" ");
-    addLine("leave");
     addLine(RET_SECT);
     addLine("");
 }
