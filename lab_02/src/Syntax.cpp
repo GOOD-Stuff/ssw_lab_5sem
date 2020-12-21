@@ -228,6 +228,7 @@ int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
             getNextLex(t_iter);
         vardpParse(t_iter, t_tree->GetRightNode());
     } else {
+        if (t_tree->GetRightNode()->GetRightNode())
         t_tree->GetRightNode()->FreeRightNode();
     }
    
