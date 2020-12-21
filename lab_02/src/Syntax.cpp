@@ -561,6 +561,16 @@ void Syntax::printError(errors t_err, Lexem lex) {
             << "' on " << lex.GetLine() << " line" << std::endl;
         break;
     }
+    case MUST_BE_TYPE: {
+        std::cerr << "<E> Syntax: Must be type instead '" << lex.GetName()
+            << "' on " << lex.GetLine() << " line" << std::endl;
+        break;
+    }
+    case MUST_BE_ASS: {
+        std::cerr << "<E> Syntax: Must be ':=' instead '" << lex.GetName()
+            << "' on " << lex.GetLine() << " line" << std::endl;
+        break;
+    }
                     // TODO: Add remaining error types
     default: {
         std::cerr << "<E> Syntax: Undefined type of error" << std::endl;
