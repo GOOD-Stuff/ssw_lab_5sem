@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #include "Lexer.h"
 
 
@@ -9,9 +5,10 @@ Lexer::Lexer(const char *file_path) {
     try {
         code.open(file_path);
     } catch (const std::exception &exp) {
-        std::string what;
+        std::string what{"<E> Lexer: Catch exception in constructor: "};
+        ;
         std::string lel(exp.what());
-        what = "<E> Lexer: Catch exception in constructor: ";
+
 
         throw std::runtime_error(what + lel);
     }
@@ -36,16 +33,19 @@ std::vector<Lexem> Lexer::ScanCode() {
             return lex_table;
         }
 
-        while(!code.eof()) {
+        while (!code.eof()) {
             lex_table.emplace_back(getLex());
         }
 
-        if (!compareLastLexem((lex_table.end() - 1), eof_tk))
-            lex_table.emplace_back(Lexem("EOF", eof_tk, line));
+        if (lex_table.back().GetToken() != eof_tk) {
+            auto eof_lex = Lexem("EOF", eof_tk, lex_table.back().GetLine() + 1);
+            lex_table.emplace_back(eof_lex);
+        }
 
         return lex_table;
     } catch (const std::exception &exp) {
-        std::cerr << "<E> Catch exception in " << __func__ << ": " << exp.what() << std::endl;
+        std::cerr << "<E> Catch exception in " << __func__ << ": " << exp.what() <<
+                  std::endl;
         return lex_table;
     }
 }
@@ -60,13 +60,16 @@ std::vector<Lexem> Lexer::ScanCode() {
 Lexem Lexer::getLex() {
     try {
         auto ch = getCurrentCurs();
+
         while (ch == -1 || ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t') {
             if (ch == '\n') line++;
 
             if (code.eof()) // if end of files
                 return Lexem("EOF", eof_tk, line);
+
             ch = getChar();
         }
+
 
         auto isId = [](char ch) {
             return std::isalpha(static_cast<unsigned char>(ch)) ||
@@ -75,6 +78,7 @@ Lexem Lexer::getLex() {
 
 
         std::string lex;
+
         if (std::isdigit(static_cast<unsigned char>(ch))) { // Constants (Numbers)
             while (std::isdigit(static_cast<unsigned char>(ch))) {
                 lex += ch;
@@ -84,39 +88,110 @@ Lexem Lexer::getLex() {
 
             return Lexem(std::move(lex), constant_tk, line);
         } else if (std::isalpha(static_cast<unsigned char>(ch))) { // Identificators
-            while(isId(ch)) {
+            while (isId(ch)) {
                 lex += ch;
                 ch = getChar();
             }
 
-            if (lex == "program")      { return Lexem(std::move(lex), program_tk, line); }
-            else if (lex == "var")     { return Lexem(std::move(lex), var_tk, line);     }
-            else if (lex == "begin")   { return Lexem(std::move(lex), begin_tk, line);   }
-            else if (lex == "integer") { return Lexem(std::move(lex), type_tk, line);    }
-            else if (lex == "boolean") { return Lexem(std::move(lex), type_tk, line);    }
-            else if (lex == "false")   { return Lexem(std::move(lex), bool_tk, line);    }
-            else if (lex == "true")    { return Lexem(std::move(lex), bool_tk, line);    }
-            else if (lex == "end")     { return Lexem(std::move(lex), end_tk, line);     }
-            else if (lex == "array")   { return Lexem(std::move(lex), array_tk, line);     }
-            else if (lex == "of")      { return Lexem(std::move(lex), of_tk, line);      }
-            else if (lex == "div")     { return Lexem(std::move(lex), div_tk, line);     }
+            if (lex == "program")      {
+                return Lexem(std::move(lex), program_tk, line);
+            } else if (lex == "var")     {
+                return Lexem(std::move(lex), var_tk, line);
+            } else if (lex == "begin")   {
+                return Lexem(std::move(lex), begin_tk, line);
+            } else if (lex == "integer") {
+                return Lexem(std::move(lex), type_tk, line);
+            } else if (lex == "boolean") {
+                return Lexem(std::move(lex), type_tk, line);
+            } else if (lex == "end")     {
+                return Lexem(std::move(lex), end_tk, line);
+            } else if (lex == "div")     {
+                return Lexem(std::move(lex), div_op_tk, line);
+            } else if (lex == "if")     {
+                return Lexem(std::move(lex), if_tk, line);
+            } else if (lex == "true")     {
+                return Lexem(std::move(lex), true_tk, line);
+            } else if (lex == "false")     {
+                return Lexem(std::move(lex), false_tk, line);
+            } else if (lex == "while")     {
+                return Lexem(std::move(lex), while_tk, line);
+            } else if (lex == "for")     {
+                return Lexem(std::move(lex), for_tk, line);
+            } else if (lex == "and")     {
+                return Lexem(std::move(lex), and_tk, line);
+            } else if (lex == "or")     {
+                return Lexem(std::move(lex), or_tk, line);
+            } else if (lex == "xor")     {
+                return Lexem(std::move(lex), xor_tk, line);
+            } else if (lex == "then")     {
+                return Lexem(std::move(lex), then_tk, line);
+            } else if (lex == "do") {
+                return Lexem(std::move(lex), do_tk, line);
+            } else if (lex == "to") {
+                return Lexem(std::move(lex), to_tk, line);
+            } else if (lex == "else")     {
+                return Lexem(std::move(lex), else_tk, line);
+            } else if (lex == "array") {
+                return Lexem(std::move(lex), array_tk, line);
+            } else if (lex == "of") {
+                return Lexem(std::move(lex), of_tk, line);
+            }
+
             else { // it is ID
                 return Lexem(std::move(lex), id_tk, line);
             }
         } else if (std::ispunct(static_cast<unsigned char>(ch))) { // Other symbols
             tokens tok;
+
             switch (ch) {
-                case ',' : tok = comma_tk; break;
-                case '.' : tok = dot_tk;   break;
-                case ':' : tok = ddt_tk;   break;
-                case ';' : tok = semi_tk;  break;
-                case '=' : tok = eqv_tk;   break;
-                case '+' : tok = add_tk;   break;
-                case '-' : tok = sub_tk;   break;
-                case '*' : tok = mul_tk;   break;
-                case '/' : tok = div_tk;   break;
-                case '[' : tok = square_op_tk;   break;
-                case ']' : tok = square_cl_tk;   break;
+                case ',' :
+                    tok = comma_tk;
+                    break;
+
+                case '.' :
+                    tok = dot_tk;
+                    break;
+
+                case ':' :
+                    tok = ddt_tk;
+                    break;
+
+                case ';' :
+                    tok = semi_tk;
+                    break;
+
+                case '=' :
+                    tok = eqv_tk;
+                    break;
+
+                case '+' :
+                    tok = add_tk;
+                    break;
+
+                case '-' :
+                    tok = sub_tk;
+                    break;
+
+                case '*' :
+                    tok = mul_tk;
+                    break;
+
+                case '(':
+                    tok = opb_tk;
+                    break;
+
+                case ')':
+                    tok = cpb_tk;
+                    break;
+
+                case '[':
+                    tok = sqbrleft_tk;
+                    break;
+
+                case ']':
+                    tok = sqbrright_tk;
+                    break;
+
                 default: {
                     std::cerr << "<E> Unknown token " << ch << std::endl;
                     tok = unknown_tk;
@@ -124,19 +199,15 @@ Lexem Lexer::getLex() {
                 }
 
             }
+
             lex += ch;
 
             if (tok == ddt_tk) {
                 ch = getChar();
+
                 if (ch == '=') {
                     lex += ch;
                     tok = ass_tk;
-                }
-            } else if (tok == dot_tk) { // for [..]
-                ch = getChar();
-                if (ch == '.') {
-                    lex += ch;
-                    tok = range_tk;
                 }
             }
 
@@ -173,16 +244,4 @@ char Lexer::getChar() {
     }
 
     return cursor;
-}
-
-
-/**
- * @brief Compare passed lexeme with token
- * @param[in] lex - lexeme which need to compare
- * @param[in] tok - token for compare
- *
- * @return result of compare, true - if equal, false - otherwise
- */
-bool Lexer::compareLastLexem(std::vector<Lexem>::iterator lex, tokens tok) {
-    return lex->GetToken() == tok;
 }

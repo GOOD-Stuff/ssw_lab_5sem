@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #ifndef LECS_PARS_SYNTAX_H
 #define LECS_PARS_SYNTAX_H
 
@@ -28,41 +24,37 @@ private:
     std::map<std::string, Variable> id_map;      // our table of identifiers
     Tree                           *root_tree;
 
+    bool error_state{0};
+
     std::map<std::string, int> operations;
 
     lex_it getNextLex(lex_it &iter);
-    lex_it getNLex(int N, lex_it &iter);
+    lex_it getPrevLex(lex_it& iter);
     lex_it peekLex(int N, lex_it t_iter);
 
 
-    int   expressionParse            (lex_it &t_iter, Tree *tree);
+    int   expressionParse            (lex_it &t_iter, Tree *tree, int& mult);
     Tree  *simplExprParse            (const lex_it &var_iter, lex_it &t_iter,
-                                      Tree *tree, Tree *arr_tree = nullptr);
+                                      Tree *tree, int& mult);
 
-    Tree* stateParse                 (lex_it &t_iter);
-    Tree* compoundParse              (lex_it &t_iter);
-
+    Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
+    Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
     int   vardpParse                 (lex_it &t_iter, Tree *t_tree);
     std::list<std::string> vardParse (lex_it &t_iter);
-    errors varParseType              (lex_it &t_iter, Variable &var_template);
-    errors varParseInit              (lex_it &t_iter, Variable &var_template);
-    errors vararParse                (lex_it &t_iter, Variable &var_template);
-
     int   blockParse                 (lex_it &t_iter);
     int   programParse               (lex_it &t_iter);
 
     void printError    (errors t_err, Lexem lex);
     bool checkLexem    (const lex_it &t_iter, const tokens &t_tok);
     bool isVarExist    (const std::string &t_var_name);
-    int  isVarArray    (const std::string &t_var_name);
     void updateVarTypes(const std::list<std::string> &t_var_list,
-                        Variable &&var_template);
-    void buildVarTree(const std::list<std::string> &var_list, Tree *t_tree);
-    void buildDeclArrSubTree(Tree *tree, const Variable &elem);
+                        const std::string &t_type_name);
+    void buildVarTree  (const std::list<std::string> &t_var_list, Tree *t_tree);
+    void buildVarTree  (const std::list<std::string>& t_var_list, Tree* t_tree,
+                        Tree* array_tree);
 
-    Tree* createVarTree(Tree *tree, Tree *donor_tree, int &iter, size_t limit);
-    void moveToEndAddCatNode(Tree *&t_tree);
-    Tree* createLowestOpTree(Tree *t_parent_tree, std::string value);
+    void createVarTree(Tree *t_tree, Tree *t_donor_tree, int lvl);
+    Tree* createLowestOpTree(Tree *t_parent_tree, std::string value, int priority_);
 };
 
 

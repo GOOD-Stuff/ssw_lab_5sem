@@ -25,8 +25,8 @@ private:
     static constexpr const char* BSS_SECT  = ".bss";
 
     static constexpr const char* TEXT_SECT = ".text";
-    static constexpr const char* GLOB_SECT = ".globl main";
-    static constexpr const char* MAIN_SECT = "main:";
+    static constexpr const char* GLOB_SECT = ".global _main";
+    static constexpr const char* MAIN_SECT = "_main:";
     static constexpr const char* RET_SECT  = "ret";
 
     static constexpr const char* BYTE_TYPE = ".byte ";
@@ -36,25 +36,28 @@ private:
     static constexpr const char* LONG_SIZE = "4";
     static constexpr const char* BYTE_SIZE = "1";
 
-    void addLine(std::string &&code_line);
-    void buildLine(std::string &&code_line);
+
 
     int generateDeclVars();
-    int generateInitVars(Tree *var_root);
-    int generateDataVar (Tree *node);
-
-    int generateUninitVars(Tree *var_root);
     int generateBssVaar   (Tree *node);
+    int generateDataVar (Tree *node);
+    int generateCompound(Tree *node);
+    int GetOperation (std::string str);
 
+    //int generateUninitVars(Tree *var_root);
+    //int generateInitVars(Tree *var_root);
+    //int GetValueExpression (Tree *node);
     void generateConstVars (Tree *var_root);
-
     void generateTextPart();
-    void generateCompound();
-    void generateExpressions();
+    void generateExpressions(Tree *node);
+    void generateExpressionsBool(Tree *node);
+    void addLine(std::string &&code_line);
+    void buildLine(std::string &&code_line);
 
     void generateLabel(const std::string &name, const std::string &type,
                        const std::string &val);
     void generateEnd();
+    void clearBuffer();
 
     std::string getType(Tree *node);
     std::string getSpec(Tree *node);
@@ -62,7 +65,9 @@ private:
 
     bool checkType(const std::string &type);
     bool checkSpec(const std::string &spec);
-    void clearBuffer();
+
+    Tree* checkVariable(std::string &&variable);
+
 };
 
 
