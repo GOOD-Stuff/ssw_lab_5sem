@@ -440,7 +440,8 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
                     printError(INCOMP_TYPES, *t_iter);
                     return nullptr;
                 }
-                if (((stoi(t_iter->GetName()) < id_map.find(var_iter->GetName())->second.range.first)) || ((stoi(t_iter->GetName()) > id_map.find(var_iter->GetName())->second.range.second))) {
+                if (((stoi(t_iter->GetName()) < id_map.find(var_iter->GetName())->second.range.first)) || 
+                    ((stoi(t_iter->GetName()) > id_map.find(var_iter->GetName())->second.range.second))) {
                     printError(OUT_RANGE, *t_iter);
                     return nullptr;
                 }
@@ -469,7 +470,8 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             auto mult = 0;
             expressionParse(t_iter, tree_exp, mult);
 
-            if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, to_tk) && (!checkLexem(t_iter, downto_tk)))) { // we exit from expression on the ';'
+            if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, to_tk) && 
+                (!checkLexem(t_iter, downto_tk)))) {
                 printError(MUST_BE_SEMI, *t_iter);
                 return nullptr;
             }
@@ -1032,7 +1034,8 @@ void Syntax::updateVarTypes(const std::list<std::string>& t_var_list,
  * @brief Update information about type in map of identifiers
  * @param[in] t_var_list  - list of variables
  * @param[in] t_type_name - type of variables
- *
+ * @param[in] range - range of array
+ * 
  * @return none
  */
 void Syntax::updateVarTypes(const std::list<std::string> &t_var_list,
