@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
-project(lecs_pars)
+project(lab4)
 
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(SRC ./src)
 
 add_executable(lecs_pars ${SRC}/main.cpp ${SRC}/lab_04.h ${SRC}/lab_04.cpp
