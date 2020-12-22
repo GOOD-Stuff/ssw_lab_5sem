@@ -1,6 +1,5 @@
 #include "GenCode.h"
 
-
 GenCode::GenCode(Tree &&t_synt_tree) {
     try {
         synt_tree = &t_synt_tree;
@@ -255,6 +254,13 @@ int GenCode::generateCompound(Tree *node) {
             std::string st = node->GetValue() + ":";//print label
             addLine(st.data());
             addLine(" ");
+
+            /*** if we have empty label in tree*///
+            if (node->GetLeftNode()==nullptr ) {
+                node = node->GetRightNode();
+                continue;
+            }
+
                             /****** operation if *******/
             if (node->GetLeftNode()->GetValue() == "if"){ //operator if
                 auto ptr = node->GetLeftNode();//ptr = *if
@@ -273,6 +279,7 @@ int GenCode::generateCompound(Tree *node) {
                     std::cerr << "<E> GenCode: need expression"<<std::endl;
                     throw std::out_of_range("error in if");
                 }
+                num_if++;
 
                 /***  left part if   ***/
                 //left part after > < <> =
@@ -283,7 +290,7 @@ int GenCode::generateCompound(Tree *node) {
                 //right part in stack
                 addLine("popl %ebx");
                 addLine("popl %eax");
-                addLine("cmp %ebx, eax");
+                addLine("cmp %ebx, %eax");
                 std::string str;
                 if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
                 else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
@@ -307,12 +314,14 @@ int GenCode::generateCompound(Tree *node) {
                 //after then
                 if (ptr->GetRightNode()->GetRightNode() != nullptr){
                     str = "jmp _end" + std::to_string(num_if) + "_";
+                    addLine(str.data());
                 }
 
                 str = " _nope" + std::to_string(num_if) + "_:";
                 addLine(str.data());
 
                 if (ptr->GetRightNode()->GetRightNode() != nullptr) {
+
                     generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
                     str = " _end" + std::to_string(num_if) + "_:";
                     addLine(str.data());
@@ -616,7 +625,7 @@ void GenCode::generateAfterCondition(Tree* node) {
     if ((node->GetLeftNode() == nullptr) && //variable
         (node->GetRightNode() == nullptr)){
 
-        std::string str = "puhl ";
+        std::string str = "pushl ";
         (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
         str += node->GetValue();
         addLine(str.data());
@@ -639,7 +648,7 @@ void GenCode::generateThenElseExpr(Tree *node) {
             nullptr) {//for d:=1 optimization(d:=value)
 
             std::string str = "movl ";
-            (checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue()) == nullptr) ? str += "$" : "";
+            (checkVariable(node->GetLeftNode()->GetRightNode()->GetValue()) == nullptr) ? str += "$" : "";
             str += node->GetLeftNode()->GetRightNode()->GetValue() + ", " +
                    node->GetLeftNode()->GetLeftNode()->GetValue();
             addLine(str.data());
@@ -653,6 +662,6 @@ void GenCode::generateThenElseExpr(Tree *node) {
         }
     }else {
         /*** begin end ***/
-        generateCompound(node->GetLeftNode());//for begin/end
+        generateCompound(node->GetLeftNode()->GetRightNode());//for begin/end
     }
 }

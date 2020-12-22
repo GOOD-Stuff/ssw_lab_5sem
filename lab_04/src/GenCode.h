@@ -7,7 +7,6 @@
 #include <array>
 #include "Syntax.h"
 
-
 class GenCode {
 public:
     GenCode(Tree &&t_synt_tree);
