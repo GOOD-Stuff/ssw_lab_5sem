@@ -13,6 +13,7 @@
 #include <vector>
 #include "Lexer.h"
 #include "Syntax.h"
+#include "GenCode.h"
 
 
 int Parse(const std::string& file_path);

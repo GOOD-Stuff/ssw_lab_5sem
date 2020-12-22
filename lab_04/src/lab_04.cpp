@@ -41,6 +41,15 @@ int Parse(const std::string& file_path) {
 
     Syntax syntx(std::move(table));
     syntx.ParseCode();
+    auto tree = syntx.retTree();
+
+    if (tree == nullptr) {
+        std::cerr << "<E> Incorrect syntax tree, abort!" << std::endl;
+        return -EXIT_FAILURE;
+    }
+
+    GenCode genCode(std::move(*tree));
+    genCode.GenerateAsm();
 
     return EXIT_SUCCESS;
 }

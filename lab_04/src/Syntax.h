@@ -17,6 +17,9 @@ public:
     explicit Syntax(std::vector<Lexem> &&t_lex_table);
     int ParseCode();
     ~Syntax();
+    Tree* retTree(){
+        return root_tree;
+    }
 private:
     using lex_it = std::vector<Lexem>::iterator; // alias of vector iterator
     lex_it                          cursor;
@@ -40,6 +43,9 @@ private:
 
     Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
     Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
+
+
+
     int   vardpParse                 (lex_it &t_iter, Tree *t_tree);
     std::list<std::string> vardParse (lex_it &t_iter);
     int   blockParse                 (lex_it &t_iter);

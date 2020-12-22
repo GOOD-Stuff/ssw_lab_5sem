@@ -174,6 +174,7 @@ int GenCode::generateDataVar(Tree *node) {
  * @note Method skips any other (init or specific) variables
  */
 int GenCode::generateBssVaar(Tree *node) {
+    //*node - name of variable
     if (node->GetRightNode() == nullptr) {
         std::cerr << "<E> GenCode: Variable doesn't have a type node" << std::endl;
         return -EXIT_FAILURE;
@@ -224,10 +225,9 @@ void GenCode::generateTextPart() {
     addLine(" ");
     addLine(MAIN_SECT);
     addLine(" ");
-    std::string str = "xorl %eax, %eax";
-    addLine(str.data());
-    str = "xorl %ebx, %ebx";
-    addLine(str.data());
+    addLine("xorl %eax, %eax");
+    addLine("xorl %ebx, %ebx");
+
     addLine(" ");
 
 
