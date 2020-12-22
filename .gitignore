@@ -168,3 +168,6 @@ lab_03/out/build/x64-Debug/build.ninja
 lab_03/out/build/x64-Debug/.ninja_log
 lab_03/out/build/x64-Debug/.ninja_deps
 lab_03/CMakeSettings.json
+lab_04/out/build/x64-Debug (по умолчанию)/VSInheritEnvironments.txt
+lab_04/out/build/x64-Debug (по умолчанию)/rules.ninja
+lab_04/out/build/x64-Debug (по умолчанию)/build.ninja
