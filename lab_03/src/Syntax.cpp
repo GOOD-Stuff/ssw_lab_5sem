@@ -261,8 +261,15 @@ int Syntax::vardpParse(Syntax::lex_it &t_iter, Tree *t_tree) {
     auto lex_value{ t_iter };
     if (checkLexem(t_iter, eqv_tk)) {
         getNextLex(t_iter);
-        if (!checkLexem(t_iter, constant_tk)) {
-            printError(MUST_BE_CONST, *t_iter);
+        if (type_iter->GetName() == "integer") {
+            if (!checkLexem(t_iter, constant_tk)) {
+                printError(MUST_BE_CONST, *t_iter);
+            }
+        }
+        else {
+            if ((!checkLexem(t_iter, false_tk)&& (!checkLexem(t_iter, true_tk)))) {
+                printError(MUST_BE_CONST, *t_iter);
+            }
         }
         lex_value = t_iter;
         getNextLex(t_iter);

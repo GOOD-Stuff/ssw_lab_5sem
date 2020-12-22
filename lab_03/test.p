@@ -1,7 +1,7 @@
 program lab;
     var
         e, z : integer = 10;
-        k, t : boolean;
+        k, t : boolean = 10;
         mas : array[1..100] of integer;
     begin
         k := false;
