@@ -1,16 +1,13 @@
 #include <iostream>
+#include <regex>
+#include <map>
 #include <string>
-#include "lab_04.h"
-/*#include "GenCode.cpp"
-#include "Lexem.cpp"
-#include "Lexer.cpp"
-#include "Syntax.cpp"
-#include "Tree.cpp"
-#include "Variable.cpp"*/
+#include "lab_03.h"
+
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    std::string path = "test.p";
-    Parse4(path);
+    std::cout << "Okey, okey, I get it" << std::endl;
+    Parse("C:/Users/Novas/Documents/GitHub/ssw_lab_5sem/lab_03/test.p");
+
     return 0;
 }

@@ -31,8 +31,6 @@ private:
     inline char getCurrentCurs() {
         return cursor;
     }
-
-    bool compareLastLexem(std::vector<Lexem>::iterator lex, tokens tok);
 };
 
 

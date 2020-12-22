@@ -1,18 +1,21 @@
 //
-// Created by vldmr on 05.11.19.
+// Created by vldmr
 //
 
-#ifndef LECS_PARS_LAB_04_H
-#define LECS_PARS_LAB_04_H
-
+#ifndef LECS_PARS_LAB_02_H
+#define LECS_PARS_LAB_02_H
 
 #include <fstream>      // for ifstream
 #include <iostream>     // for cout/cerr
+#include <list>
+#include <map>
+#include <string>
+#include <vector>
 #include "Lexer.h"
 #include "Syntax.h"
-#include "GenCode.h"
 
 
-int Parse4(const std::string& file_path);
+int Parse(const std::string& file_path);
 
-#endif //LECS_PARS_LAB_04_H
+
+#endif //LECS_PARS_LAB_02_H

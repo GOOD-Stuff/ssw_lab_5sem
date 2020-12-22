@@ -1,7 +1,3 @@
-//
-// Created by vovan on 28.09.2019.
-//
-
 #include "Lexem.h"
 
 
@@ -11,7 +7,7 @@
  *
  * @return name of lexeme
  */
-std::string Lexem::GetName() {
+const std::string Lexem::GetName() {
     return name;
 }
 
@@ -22,7 +18,7 @@ std::string Lexem::GetName() {
  *
  * @return type (token) of lexeme
  */
-tokens Lexem::GetToken() {
+tokens Lexem::GetToken() const {
     return token;
 }
 
@@ -35,4 +31,14 @@ tokens Lexem::GetToken() {
  */
 int Lexem::GetLine() {
     return line;
+}
+
+/**
+ * @brief Rename lexem
+ * @param[in] name_ - new name
+ *
+ * @return none
+*/
+void Lexem::RenameLex(std::string name_) {
+    name = name_;
 }
