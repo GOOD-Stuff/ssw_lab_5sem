@@ -71,6 +71,7 @@ enum errors {
     UNKNOWN_ID,      // Error: Undefined identifier
     INCOMP_TYPES,    // Error: Incompatible types
     OUT_RANGE,       // Error: Out range array
+    MUST_BE_COMP,      // Error: Must be '<>!='
 };
 
 
