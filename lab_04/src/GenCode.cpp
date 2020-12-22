@@ -20,7 +20,6 @@ GenCode::GenCode(Tree &&t_synt_tree) {
 GenCode::~GenCode() {
     code.close();
     clearBuffer();
-    //Tree::FreeTree(synt_tree);
 }
 
 
@@ -118,8 +117,6 @@ int GenCode::generateDeclVars() {
 
     ptr = ptr->GetRightNode();
     }
-
-    //generateConstVars(synt_tree->GetLeftNode());
     return EXIT_SUCCESS;
 }
 
@@ -150,13 +147,20 @@ int GenCode::generateDataVar(Tree *node) {
             return EXIT_SUCCESS;
         }
     }
-
+    std::string val;
     if (node->GetLeftNode() != nullptr) {
-        auto val = node->GetLeftNode()->GetValue();
-        if (getType(node) == types.at(1)) { // if type is boolean
-            if (val == "false") val = "0";
-            else                val = "1";
+        if ((node->GetLeftNode()->GetLeftNode() != nullptr) ||
+            (node->GetLeftNode()->GetRightNode() != nullptr)){//some a = 4+1+1+...
+                    /**code for it**/
+        }else {
+           val = node->GetLeftNode()->GetValue();
+            if (getType(node) == types.at(1)) { // if type is boolean
+                if (val == "false") val = "0";
+                else                val = "1";
+            }
         }
+
+
 
         std::string type = (getType(node) == types.at(0)) ? LONG_TYPE : BYTE_TYPE;
         generateLabel(node->GetValue(), type, val);
@@ -227,14 +231,11 @@ void GenCode::generateTextPart() {
     addLine(" ");
     addLine("xorl %eax, %eax");
     addLine("xorl %ebx, %ebx");
-
     addLine(" ");
 
 
     if(generateCompound(synt_tree->GetRightNode()->GetRightNode()))
         std::cerr << "<E> GenCode error in begin/end operation" << std::endl;
-
-
 }
 
 
@@ -246,7 +247,7 @@ void GenCode::generateTextPart() {
  */
 int GenCode::generateCompound(Tree *node) {
     try{
-        while (node->GetValue() != "end" && node->GetValue() != "end."){
+        while (node->GetValue() != "end" && node->GetValue() != "end." ){
 
             if (node->GetValue() == "end" || node->GetValue() == "end.")
                 return EXIT_SUCCESS;
@@ -254,52 +255,100 @@ int GenCode::generateCompound(Tree *node) {
             std::string st = node->GetValue() + ":";//print label
             addLine(st.data());
             addLine(" ");
-
+                            /****** operation if *******/
             if (node->GetLeftNode()->GetValue() == "if"){ //operator if
+                auto ptr = node->GetLeftNode();//ptr = *if
 
+                if (ptr->GetLeftNode() == nullptr ) {
+                    std::cerr << "<E> GenCode: need condition in if" << std::endl;
+                    throw std::out_of_range("error in if");
+                }
+
+                if (ptr->GetRightNode()->GetValue() != "then") {
+                    std::cerr << "<E> GenCode: need then"<<std::endl;
+                    throw std::out_of_range("error in if");
+                }
+
+                if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
+                    std::cerr << "<E> GenCode: need expression"<<std::endl;
+                    throw std::out_of_range("error in if");
+                }
+
+                /***  left part if   ***/
+                //left part after > < <> =
+
+                generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
+                //left part in stack
+                generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
+                //right part in stack
+                addLine("popl %ebx");
+                addLine("popl %eax");
+                addLine("cmp %ebx, eax");
+                std::string str;
+                if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
+                else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
+                else if (ptr->GetLeftNode()->GetValue() == "=") str ="jgl";
+                else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
+                else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
+                else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+
+                else {
+                    std::cerr << "Undefined condition";
+                    throw std::out_of_range("error in if");
+                }
+                str += " _nope" + std::to_string(num_if) + "_";
+                addLine(str.data());
+                /***  right part if   ***/
+                //ptr->GetRightNode() -- *then
+                generateThenElseExpr (ptr->GetRightNode());
+                ////
+
+
+                //after then
+                if (ptr->GetRightNode()->GetRightNode() != nullptr){
+                    str = "jmp _end" + std::to_string(num_if) + "_";
+                }
+
+                str = " _nope" + std::to_string(num_if) + "_:";
+                addLine(str.data());
+
+                if (ptr->GetRightNode()->GetRightNode() != nullptr) {
+                    generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
+                    str = " _end" + std::to_string(num_if) + "_:";
+                    addLine(str.data());
+                }
+
+                                 /****** operation goto *******/
             }else if (node->GetLeftNode()->GetValue() == "goto"){
                 std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
                 addLine(str.data());
 
+                /****** operation := *******/
+
             }else if (node->GetLeftNode()->GetValue() == ":="){
 
-                Tree* var;
-                if ((var = checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue())) == nullptr ){//if undefined variable
+                if ((checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue())) == nullptr ){//if undefined variable
                     throw std::out_of_range("undefined variable");
                 }
 
-                if (var->GetRightNode()->GetValue() == "integer"){//int expression
+                    if (node->GetLeftNode()->GetRightNode()->GetLeftNode() == nullptr ){//for d:=1 optimization(d:=value)
 
-                    if (node->GetLeftNode()->GetRightNode()->GetLeftNode() == nullptr ){// for d:=1 optimization(d:=value)
-
-
-                        std::string str = "movl $" + node->GetLeftNode()->GetRightNode()->GetValue() +
-                                          ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
+                        std::string str = "movl ";
+                        (checkVariable(node->GetLeftNode()->GetRightNode()->GetValue()) == nullptr) ? str += "$" : "";
+                        str += node->GetLeftNode()->GetRightNode()->GetValue() + ", " +
+                                node->GetLeftNode()->GetLeftNode()->GetValue();
                         addLine(str.data());
 
-                    }else {//for d:= 1+2...(d:=expression)
+                    }else {/***for d:= 1+2...(d:=expression)***/
 
                         generateExpressions(node->GetLeftNode()->GetRightNode());
-                        std::string str = "popl %eax";
-                        addLine(str.data());
-                        str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
+                        addLine("popl %eax");
+                        std::string str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
                         addLine(str.data());
                     }
-                }else {//bool expression
 
-                    if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
-                        nullptr) {// for d:=true optimization(d:=value)
+                        /****** operation begin *******/
 
-                        std::string str = "movb $" + (std::to_string((node->GetLeftNode()->GetRightNode()->GetValue() == "true") ? 1 : 0)) +
-                                          ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());
-                    } else {
-                        generateExpressionsBool(node->GetLeftNode()->GetRightNode());
-                        std::string str = "popb %al";
-                        addLine(str.data());
-                        str = "movb %al, $" + node->GetLeftNode()->GetLeftNode()->GetValue();
-                        addLine(str.data());}
-                }
             }else if (node->GetLeftNode()->GetValue() == "begin"){
 
                 if (generateCompound(node->GetLeftNode()->GetRightNode())){
@@ -323,18 +372,29 @@ int GenCode::generateCompound(Tree *node) {
  * @param[in] tree* node (start of expresion)
  *
  * @return none
- * @note Generation GAS code for :__:= 15 + 12;
- * will be: pushl $15;  movl $12, %eax; popl %ebx; addl %ebx, %eax; pushl %eax;
+ * @note result left subtree in eax; right in ebx
  * result in stack;
  */
-void GenCode::generateExpressions(Tree *node){
-    if (node->GetRightNode() == nullptr && node->GetLeftNode() == nullptr){
-        if (node->GetParentNode()->GetLeftNode() == node){
-            std::string str = "pushl $" + node->GetValue();
+void GenCode::generateExpressions(Tree *node) {
+
+    if (node->GetRightNode() == nullptr && node->GetLeftNode() == nullptr) {
+
+        if (node->GetParentNode()->GetLeftNode() == node) {
+
+            //push $12 or push a;
+            std::string str = "pushl ";
+            (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
+            str += node->GetValue();
             addLine(str.data());
-        }else {
-            std::string str = "movl $" + node->GetValue() + ", %eax";
+
+        } else {
+
+            //movl $12, %ebx or movl a, %ebx;
+            std::string str = "movl ";
+            (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
+            str += node->GetValue() + ", %ebx";
             addLine(str.data());
+
         }
         return;
     }
@@ -345,81 +405,42 @@ void GenCode::generateExpressions(Tree *node){
     if (node->GetRightNode() != nullptr)
         generateExpressions(node->GetRightNode());
 
-    std::string str = "popl %ebx";
-    addLine(str.data());
+    if (node->GetRightNode()!=nullptr){
+        if ((node->GetRightNode()->GetRightNode()!=nullptr) &&
+        (node->GetRightNode()->GetLeftNode()!=nullptr))
+            addLine("popl %ebx");
+    }
+
+    addLine("popl %eax");
 
     switch (GetOperation(node->GetValue())) {
         case 1:
-            str = "addl %ebx, %eax";
+            addLine("addl %ebx, %eax");
             break;
         case 2:
-            str = "subl  %ebx, %eax";
+            addLine("subl  %ebx, %eax");
             break;
         case 3:
-            str = "mull  %ebx";
+            addLine("xorl %edx, %edx");
+            addLine("mull  %ebx");
             break;
-        case 4://Регистры при делении ЧЕЕЕЕк
-            str = "xorl %edx, %edx";
-            addLine(str.data());
-            str = "divl  %ebx";
+        case 4:
+            addLine("xorl %edx, %edx");
+            addLine("divl  %ebx");
             break;
-        default: throw std::out_of_range("invalid operation");
-    }
-    addLine(str.data());
-    str = "pushl %eax";
-    addLine(str.data());
-}
-
-/**
- * @brief Generate Gas for bool expresion
- * @param[in] tree* node (start of expresion)
- *
- * @return none
- * @note Generation GAS code for :__:= false and true;
- * will be: pushb $0    movb $1, %al    popb %bl    andb %bl, %al
-*           pushb %al   popb %al
- * result in stack;
- */
-void GenCode::generateExpressionsBool(Tree *node){
-    if (node->GetRightNode() == nullptr && node->GetLeftNode() == nullptr){
-
-        if (node->GetParentNode()->GetLeftNode() == node){
-
-            std::string str = "pushb $" + std::to_string((node->GetValue() == "true") ? 1 : 0);
-            addLine(str.data());
-
-        }else {
-
-            std::string str = "movb $" + std::to_string((node->GetValue() == "true") ? 1 : 0) + ", %al";
-            addLine(str.data());
-
-        }
-        return;
-    }
-    if (node->GetLeftNode() != nullptr)
-        generateExpressionsBool(node->GetLeftNode());
-
-    if (node->GetRightNode() != nullptr)
-        generateExpressionsBool(node->GetRightNode());
-
-    std::string str = "popb %bl";
-    addLine(str.data());
-
-    switch (GetOperation(node->GetValue())) {
         case 5:
-            str = "andb %bl, %al";
+            addLine("andl %ebx, %eax");
             break;
         case 6:
-            str = "xorb  %bl, %al";
+            addLine("xorl %ebx, %eax");
             break;
         case 7:
-            str = "orb  %bl, %al";
+            addLine("orl %ebx, %eax");
             break;
-        default: throw std::out_of_range("invalid operation");
+        default:
+            throw std::out_of_range("invalid operation");
     }
-    addLine(str.data());
-    str = "pushb %al";
-    addLine(str.data());
+    addLine("pushl %eax");
 }
 
 /**
@@ -428,7 +449,7 @@ void GenCode::generateExpressionsBool(Tree *node){
  * @return int number operation ( 1:+; 2:-; 3:*; 4:div; 5:and; 6:xor; 7:or;
  * else exception
  */
-int GenCode::GetOperation (std::string str){
+int GenCode::GetOperation (const std::string str){
     if (str == "+") return 1;
     if (str == "-") return 2;
     if (str == "*") return 3;
@@ -589,4 +610,49 @@ bool GenCode::checkSpec(const std::string &spec) {
 void GenCode::clearBuffer() {
     test_str.str("");
     test_str.clear();
+}
+
+void GenCode::generateAfterCondition(Tree* node) {
+    if ((node->GetLeftNode() == nullptr) && //variable
+        (node->GetRightNode() == nullptr)){
+
+        std::string str = "puhl ";
+        (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
+        str += node->GetValue();
+        addLine(str.data());
+    }else {//expression
+        generateExpressions(node);
+    }
+}
+
+void GenCode::generateThenElseExpr(Tree *node) {
+
+    if (node->GetLeftNode()->GetValue() == ":=") {
+
+        if (checkVariable((node->GetLeftNode()->GetLeftNode()->GetValue())) ==
+            nullptr) {//if undefined variable
+            throw std::out_of_range("undefined variable");
+        }
+        //node->GetLeftNode() -- *:=
+
+        if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
+            nullptr) {//for d:=1 optimization(d:=value)
+
+            std::string str = "movl ";
+            (checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue()) == nullptr) ? str += "$" : "";
+            str += node->GetLeftNode()->GetRightNode()->GetValue() + ", " +
+                   node->GetLeftNode()->GetLeftNode()->GetValue();
+            addLine(str.data());
+
+        } else {/***for d:= 1+2...(d:=expression)***/
+
+            generateExpressions(node->GetLeftNode()->GetRightNode());
+            addLine("popl %eax");
+            std::string str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
+            addLine(str.data());
+        }
+    }else {
+        /*** begin end ***/
+        generateCompound(node->GetLeftNode());//for begin/end
+    }
 }

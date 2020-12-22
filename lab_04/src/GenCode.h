@@ -19,6 +19,7 @@ private:
     Tree         *synt_tree;
     std::ofstream code;
     std::ostringstream test_str;
+    size_t num_if {0};
 
     const std::array<std::string, 2> types  = {"integer", "boolean"};
     const std::array<std::string, 2> specif = {"array", "const"};
@@ -38,21 +39,16 @@ private:
     static constexpr const char* LONG_SIZE = "4";
     static constexpr const char* BYTE_SIZE = "1";
 
-
-
     int generateDeclVars();
     int generateBssVaar   (Tree *node);
     int generateDataVar (Tree *node);
     int generateCompound(Tree *node);
-    int GetOperation (std::string str);
+    int GetOperation (const std::string str);
 
-    //int generateUninitVars(Tree *var_root);
-    //int generateInitVars(Tree *var_root);
-    //int GetValueExpression (Tree *node);
-    void generateConstVars (Tree *var_root);
+    void generateAfterCondition (Tree* node);
+    void generateThenElseExpr (Tree* node);
     void generateTextPart();
     void generateExpressions(Tree *node);
-    void generateExpressionsBool(Tree *node);
     void addLine(std::string &&code_line);
     void buildLine(std::string &&code_line);
 
@@ -60,6 +56,8 @@ private:
                        const std::string &val);
     void generateEnd();
     void clearBuffer();
+    void generateConstVars (Tree *var_root);
+
 
     std::string getType(Tree *node);
     std::string getSpec(Tree *node);

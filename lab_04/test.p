@@ -1,17 +1,9 @@
 program lab04;
     var
-        b    : boolean;
-        a, d : integer;
-        c : array [0..3] of integer;
+        a,b,k: integer = 1;
+
     begin
-        begin
-            a := 23 + 2 * 3 - 1;
-            d := a;
-        end;
-        begin
-            begin
-                b := true;
-            end;            
-        end;
-        c[1] := a + d - 3 + 4;
+        if (a = 1) then
+         a := b - 2 + 32 div 2 - 5;
+
     end.
