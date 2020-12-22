@@ -162,3 +162,9 @@ ipch/
 
 # Qt Creator
 build-*/
+lab_03/out/build/x64-Debug/VSInheritEnvironments.txt
+lab_03/out/build/x64-Debug/rules.ninja
+lab_03/out/build/x64-Debug/build.ninja
+lab_03/out/build/x64-Debug/.ninja_log
+lab_03/out/build/x64-Debug/.ninja_deps
+lab_03/CMakeSettings.json

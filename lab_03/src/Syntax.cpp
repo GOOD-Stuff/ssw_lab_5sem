@@ -547,7 +547,7 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             result_tree = tree_exp;
             
 
-            if ((var_iter->GetToken() == id_tk)||(var_iter->GetToken() == begin_tk)) {
+            if ((var_iter->GetToken() == id_tk)||(var_iter->GetToken() == begin_tk)|| (var_iter->GetToken() == goto_tk)) {
                 var_iter = getPrevLex(var_iter);
                 result_tree->GetRightNode()->AddLeftTree(stateParse(var_iter, compound_count_f));
             }
