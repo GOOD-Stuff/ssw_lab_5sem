@@ -138,18 +138,7 @@ Lexem Lexer::getLex() {
             } else if (lex == "of") {
                 return Lexem(std::move(lex), of_tk, line);
             }
-            else if (lex == "<=") {
-                return Lexem(std::move(lex), comp_tk, line);
-            }
-            else if (lex == ">=") {
-                return Lexem(std::move(lex), comp_tk, line);
-            }
-            else if (lex == "<>") {
-                return Lexem(std::move(lex), comp_tk, line);
-            }
-            else if (lex == "of") {
-                return Lexem(std::move(lex), comp_tk, line);
-            }
+
 
             else { // it is ID
                 return Lexem(std::move(lex), id_tk, line);
@@ -230,6 +219,19 @@ Lexem Lexer::getLex() {
                 if (ch == '=') {
                     lex += ch;
                     tok = ass_tk;
+                }
+            }
+
+            if (tok == comp_tk) {
+                ch = getChar();
+
+                if (ch == '=') {
+                    lex += ch;
+                    tok = comp_tk;
+                }
+                if ((ch == '>') && (lex == "<")) {
+                    lex += ch;
+                    tok = comp_tk;
                 }
             }
 
