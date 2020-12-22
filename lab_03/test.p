@@ -1,6 +1,8 @@
 program lab;
     var
         a,b,k: integer = 1;
+        metka : label;
     begin
-        if a<>k then a:=10;
+    metka:
+        if a<>k then goto metka;
     end.

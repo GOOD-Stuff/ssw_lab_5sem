@@ -34,6 +34,7 @@ enum tokens {
     do_tk,              // 'do'
     for_tk,             // 'for'
     to_tk,              // 'to'
+    goto_tk,            // 'goto'
     downto_tk,          // 'downto'
     or_tk,              // 'or'
     and_tk,             // 'and'
@@ -72,6 +73,7 @@ enum errors {
     INCOMP_TYPES,    // Error: Incompatible types
     OUT_RANGE,       // Error: Out range array
     MUST_BE_COMP,      // Error: Must be '<>!='
+    MUST_BE_DDT,     // Error: Must be :
 };
 
 

@@ -396,9 +396,15 @@ Tree *Syntax::compoundParse(lex_it &t_iter, int compound_count) {
         auto *subTree = stateParse(t_iter, compound_count);
 
         if (subTree != nullptr) {
-            tree->AddRightNode(label(), 0);
-            tree->GetRightNode()->AddLeftTree(subTree);
-            tree = tree->GetRightNode();
+            if ((subTree->GetLeftNode() == nullptr) || (subTree->GetRightNode() == nullptr)) {
+                tree->AddRightNode(subTree->GetValue());
+                tree = tree->GetRightNode();
+            }
+            else {
+                tree->AddRightNode(label(), 0);
+                tree->GetRightNode()->AddLeftTree(subTree);
+                tree = tree->GetRightNode();
+            }
 
             if (!is_end()) sec_prm++;
         }
@@ -437,6 +443,16 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             if (!isVarExist(iter->GetName())) {
                 printError(UNKNOWN_ID, *t_iter);
                 return nullptr;
+            }
+
+            if (id_map.find(t_iter->GetName())->second.type == "label") {
+                if ((getNextLex(t_iter))->GetToken() != ddt_tk) {
+                    printError(MUST_BE_DDT, *t_iter);
+                    return nullptr;
+                }
+                result_tree = Tree::CreateNode(iter->GetName());
+
+                return result_tree;
             }
 
             auto var_iter = iter;
@@ -594,6 +610,31 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
 
             if (tree_comp != nullptr)
                 result_tree = tree_comp;
+
+            break;
+        }
+
+        case goto_tk: {
+            auto go_to = t_iter;
+            if (getNextLex(t_iter)->GetToken() != id_tk) {
+                printError(MUST_BE_ID, *t_iter);
+                return nullptr;
+            }
+
+            auto search = id_map.find(t_iter->GetName());
+            if (search != id_map.end()) {
+                if ((search->second.type) != "label") {
+                    printError(INCOMP_TYPES, *t_iter);
+                    return nullptr;
+                }
+                auto* tree_goto = Tree::CreateNode(go_to->GetName());
+                tree_goto->AddRightNode(t_iter->GetName());
+                result_tree = tree_goto;
+            }
+            else {
+                printError(UNKNOWN_ID, *t_iter);
+                return nullptr;
+            }
 
             break;
         }

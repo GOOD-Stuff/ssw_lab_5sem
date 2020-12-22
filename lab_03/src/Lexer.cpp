@@ -103,6 +103,9 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), type_tk, line);
             } else if (lex == "boolean") {
                 return Lexem(std::move(lex), type_tk, line);
+            }
+            else if (lex == "label") {
+                return Lexem(std::move(lex), type_tk, line);
             } else if (lex == "end")     {
                 return Lexem(std::move(lex), end_tk, line);
             } else if (lex == "div")     {
@@ -129,6 +132,9 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), do_tk, line);
             } else if (lex == "to") {
                 return Lexem(std::move(lex), to_tk, line);
+            }
+            else if (lex == "goto") {
+                return Lexem(std::move(lex), goto_tk, line);
             } else if (lex == "downto") {
                 return Lexem(std::move(lex), downto_tk, line);
             } else if (lex == "else")     {
