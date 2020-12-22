@@ -33,10 +33,10 @@ private:
     lex_it peekLex(int N, lex_it t_iter);
 
 
-    int   expressionParse            (lex_it &t_iter, Tree *tree, int& mult);
+    int   expressionParse(lex_it& t_iter, Tree* tree, int& mult, std::string var_type);
     Tree  *simplExprParse            (const lex_it &var_iter, lex_it &t_iter,
-                                      Tree *tree, int& mult);
-    Tree* simplExprParse(Tree* var_tree, Syntax::lex_it& t_iter, Tree* tree, int& mult);
+                                      Tree *tree, int& mult, std::string var_type);
+    Tree* simplExprParse(Tree* var_tree, Syntax::lex_it& t_iter, Tree* tree, int& mult, std::string type_var);
 
     Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
     Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
