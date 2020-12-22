@@ -36,6 +36,7 @@ private:
     int   expressionParse            (lex_it &t_iter, Tree *tree, int& mult);
     Tree  *simplExprParse            (const lex_it &var_iter, lex_it &t_iter,
                                       Tree *tree, int& mult);
+    Tree* simplExprParse(Tree* var_tree, Syntax::lex_it& t_iter, Tree* tree, int& mult);
 
     Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
     Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
@@ -44,11 +45,15 @@ private:
     int   blockParse                 (lex_it &t_iter);
     int   programParse               (lex_it &t_iter);
 
+    //void checkTypesTree(Tree* tree, int type_hand, std::string type);
+
     void printError    (errors t_err, Lexem lex);
     bool checkLexem    (const lex_it &t_iter, const tokens &t_tok);
     bool isVarExist    (const std::string &t_var_name);
     void updateVarTypes(const std::list<std::string> &t_var_list,
                         const std::string &t_type_name);
+    void updateVarValue(const std::list<std::string>& t_var_list,
+        const std::string& t_value);
     void updateVarTypes(const std::list<std::string>& t_var_list,
         const std::string& t_type_name, const std::pair<int, int>& range);
     void buildVarTree  (const std::list<std::string> &t_var_list, Tree *t_tree);
