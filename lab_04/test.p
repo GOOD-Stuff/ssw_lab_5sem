@@ -13,5 +13,5 @@ program lab04;
                 b := true;
             end;            
         end;
-        c[1 + 1] := a + d - 3 + 4;
+        c[1] := a + d - 3 + 4;
     end.

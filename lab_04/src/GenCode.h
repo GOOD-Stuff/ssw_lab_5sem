@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <fstream>
-#include "Tree.h"
+#include <sstream>
+#include <array>
+#include "Syntax.h"
 
 
 class GenCode {
