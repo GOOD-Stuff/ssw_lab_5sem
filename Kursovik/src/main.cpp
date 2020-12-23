@@ -15,6 +15,11 @@ int main(int argc, char* argv[]){
         Parse(source, dest);
     }
     else {
+        if (argc == 1) {
+            std::string source = "source.p";
+            std::string dest = "dest.S";
+            Parse(source, dest);
+        }
         if (argc == 2) {
             std::string help = argv[1];
             if (help == "-help") {
