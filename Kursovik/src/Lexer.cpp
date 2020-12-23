@@ -115,13 +115,6 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), true_tk, line);
             } else if (lex == "false")     {
                 return Lexem(std::move(lex), false_tk, line);
-
-            } else if (lex == "and")     {
-                return Lexem(std::move(lex), and_tk, line);
-            } else if (lex == "or")     {
-                return Lexem(std::move(lex), or_tk, line);
-            } else if (lex == "xor")     {
-                return Lexem(std::move(lex), xor_tk, line);
             }
             else if (lex == "then") {
                 return Lexem(std::move(lex), then_tk, line);
@@ -133,9 +126,6 @@ Lexem Lexer::getLex() {
             } else if (lex == "else")     {
                 return Lexem(std::move(lex), else_tk, line);
             } else if (lex == "array") {
-                return Lexem(std::move(lex), array_tk, line);
-            } else if (lex == "of") {
-                return Lexem(std::move(lex), of_tk, line);
             }
 
 
@@ -184,14 +174,6 @@ Lexem Lexer::getLex() {
 
                 case ')':
                     tok = cpb_tk;
-                    break;
-
-                case '[':
-                    tok = sqbrleft_tk;
-                    break;
-
-                case ']':
-                    tok = sqbrright_tk;
                     break;
 
                 case '>':

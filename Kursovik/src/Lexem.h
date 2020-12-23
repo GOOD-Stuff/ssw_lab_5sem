@@ -29,17 +29,8 @@ enum tokens {
     else_tk,            // 'else'
     true_tk,            // 'true'
     false_tk,           // 'false'
-
     goto_tk,            // 'goto'
-    or_tk,              // 'or'
-    and_tk,             // 'and'
-    xor_tk,             // 'xor'
-    array_tk,           // 'array'
-    of_tk,              // 'of'
-    sqbrleft_tk,        // '['
-    sqbrright_tk,       // ']'
-    comp_tk,
-
+    comp_tk,            // '<=' '>=' '<>' '>' '<'
     eof_tk              // end of file
 };
 
@@ -58,16 +49,12 @@ enum errors {
     MUST_BE_BKT_END, // Error: Must be ')'
     MUST_BE_BKT_BGN, // Error: Must be '('
     MUST_BE_THEN,    // Error: Must be 'then'
-    MUST_BE_OF,      // Error: Must be 'of'
-    MUST_BE_SQBRLEFT,   // Error: Must be '['
-    MUST_BE_SQBRRIGHT,  // Error: Must be ']'
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
     INCOMP_TYPES,    // Error: Incompatible types
-    OUT_RANGE,       // Error: Out range array
-    MUST_BE_COMP,      // Error: Must be '<>!='
+    MUST_BE_COMP,    // Error: Must be '<>!='
     MUST_BE_DDT,     // Error: Must be :
-    LABEL_OVER,      // Eror: 2 Label in prog
+    LABEL_OVER,      // Eror: 2 and more Label in prog
     UNDEF_LABEL,     // Label Used but not defined
 };
 
