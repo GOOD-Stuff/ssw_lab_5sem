@@ -7,7 +7,7 @@
 
 int main() {
     std::cout << "Okey, okey, I get it" << std::endl;
-    Parse("C:/Users/Pushistii_pidaras/Documents/GitHub/ssw_lab_5sem/lab_04/test.p");
+    Parse("C:/Users/Stinger/Documents/GitHub/ssw_lab_5sem/lab_04/test.p");
 
     return 0;
 }

@@ -17,6 +17,7 @@ public:
     explicit Syntax(std::vector<Lexem> &&t_lex_table);
     int ParseCode();
     ~Syntax();
+    Tree* retTree() const { return root_tree; };
 private:
     using lex_it = std::vector<Lexem>::iterator; // alias of vector iterator
     lex_it                          cursor;

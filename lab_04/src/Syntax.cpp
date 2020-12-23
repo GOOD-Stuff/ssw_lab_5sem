@@ -40,10 +40,6 @@ Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
     operations.emplace("*",   3);
     operations.emplace("div", 3);
 
-    operations.emplace("and", 2);
-    operations.emplace("xor", 2);
-    operations.emplace("or", 2);
-
     operations.emplace("=", 2);
     operations.emplace("<", 2);
     operations.emplace(">", 2);
@@ -506,18 +502,16 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             auto mult = 0;
             expressionParse(t_iter, tree_exp, mult, id_map.find(var_iter->GetName())->second.type);
 
-            if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, to_tk) && 
-                (!checkLexem(t_iter, downto_tk) && (!checkLexem(t_iter, else_tk))))) {
+            if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, else_tk))){
                 printError(MUST_BE_SEMI, *t_iter);
                 return nullptr;
             }
-
             result_tree = tree_exp;
+
             break;
         }
 
-        case if_tk:
-        case while_tk: {
+        case if_tk:{
 
             auto* tree_exp = Tree::CreateNode(t_iter->GetName());
             auto mult = 0;
@@ -532,12 +526,6 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             if (iter->GetToken() == if_tk) {
                 if (t_iter->GetToken() != then_tk) {
                     printError(MUST_BE_THEN, *t_iter);
-                    return nullptr;
-                }
-            }
-            else {
-                if (t_iter->GetToken() != do_tk) {
-                    printError(MUST_BE_DO, *t_iter);
                     return nullptr;
                 }
             }
@@ -565,40 +553,7 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             break;
         }
 
-        case for_tk: {
-            auto* tree_exp = Tree::CreateNode(t_iter->GetName());
-            result_tree = tree_exp;
-            auto mult = 0;
-            auto left_node = stateParse(t_iter, 0);
-
-            if ((!checkLexem(t_iter, to_tk))&&(!checkLexem(t_iter, downto_tk))) {
-                printError(MUST_BE_TO, *t_iter);
-                return nullptr;
-            }
-
-            auto* tree_to = Tree::CreateNode(t_iter->GetName());
-            tree_to->AddLeftTree(left_node);
-            tree_exp->AddLeftTree(tree_to);
-            expressionParse(t_iter, tree_exp->GetLeftNode(), mult, "");
-
-            if (t_iter->GetToken() != do_tk) {
-                printError(MUST_BE_DO, *t_iter);
-                return nullptr;
-            }
-
-            auto var_iter = getNextLex(t_iter);
-
-            if ((var_iter->GetToken() != id_tk) && (var_iter->GetToken() != begin_tk)) {
-                printError(MUST_BE_ID, *t_iter);
-                return nullptr;
-            }
-
-            var_iter = getPrevLex(var_iter);
-            result_tree->AddRightTree(stateParse(var_iter, compound_count_f));
-            t_iter = var_iter;
-
-            break;
-        }
+        
 
         case begin_tk: {
             auto *tree_comp = compoundParse(t_iter, compound_count_f);
@@ -1064,16 +1019,6 @@ void Syntax::printError(errors t_err, Lexem lex) {
         case MUST_BE_THEN: {
             std::cerr << "<E> Syntax: Must be 'then' on " << lex.GetLine() << " line" <<
                       std::endl;
-            break;
-        }
-
-        case MUST_BE_DO: {
-            std::cerr << "<E> Syntax: Must be 'do' on " << lex.GetLine() << " line" << std::endl;
-            break;
-        }
-
-        case MUST_BE_TO: {
-            std::cerr << "<E> Syntax: Must be 'to' or 'downto' on " << lex.GetLine() << " line" << std::endl;
             break;
         }
 

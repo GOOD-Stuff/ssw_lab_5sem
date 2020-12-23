@@ -115,27 +115,21 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), true_tk, line);
             } else if (lex == "false")     {
                 return Lexem(std::move(lex), false_tk, line);
-            } else if (lex == "while")     {
-                return Lexem(std::move(lex), while_tk, line);
-            } else if (lex == "for")     {
-                return Lexem(std::move(lex), for_tk, line);
+
             } else if (lex == "and")     {
                 return Lexem(std::move(lex), and_tk, line);
             } else if (lex == "or")     {
                 return Lexem(std::move(lex), or_tk, line);
             } else if (lex == "xor")     {
                 return Lexem(std::move(lex), xor_tk, line);
-            } else if (lex == "then")     {
-                return Lexem(std::move(lex), then_tk, line);
-            } else if (lex == "do") {
-                return Lexem(std::move(lex), do_tk, line);
-            } else if (lex == "to") {
-                return Lexem(std::move(lex), to_tk, line);
             }
+            else if (lex == "then") {
+                return Lexem(std::move(lex), then_tk, line);
+            }
+
             else if (lex == "goto") {
                 return Lexem(std::move(lex), goto_tk, line);
-            } else if (lex == "downto") {
-                return Lexem(std::move(lex), downto_tk, line);
+
             } else if (lex == "else")     {
                 return Lexem(std::move(lex), else_tk, line);
             } else if (lex == "array") {
