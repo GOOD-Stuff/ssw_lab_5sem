@@ -636,6 +636,7 @@ void GenCode::generateAfterCondition(Tree* node) {
 
 void GenCode::generateThenElseExpr(Tree *node) {
 
+                    /*** := in if ***/
     if (node->GetLeftNode()->GetValue() == ":=") {
 
         if (checkVariable((node->GetLeftNode()->GetLeftNode()->GetValue())) ==
@@ -660,8 +661,81 @@ void GenCode::generateThenElseExpr(Tree *node) {
             std::string str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
             addLine(str.data());
         }
-    }else {
+
+                        /*** if in if ***/
+
+    }else if (node->GetLeftNode()->GetValue() == "if"){
+        num_if++;
+        auto ptr = node->GetLeftNode();
+        if (ptr->GetLeftNode() == nullptr ) {
+            std::cerr << "<E> GenCode: need condition in if" << std::endl;
+            throw std::out_of_range("error in if");
+        }
+
+        if (ptr->GetRightNode()->GetValue() != "then") {
+            std::cerr << "<E> GenCode: need then"<<std::endl;
+            throw std::out_of_range("error in if");
+        }
+
+        if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
+            std::cerr << "<E> GenCode: need expression"<<std::endl;
+            throw std::out_of_range("error in if");
+        }
+
+                    /***  left part if   ***/
+        //left part after > < <> =
+
+        generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
+        //left part in stack
+        generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
+        //right part in stack
+        addLine("popl %ebx");
+        addLine("popl %eax");
+        addLine("cmp %ebx, %eax");
+        std::string str;
+        if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
+        else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
+        else if (ptr->GetLeftNode()->GetValue() == "=") str ="jgl";
+        else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
+        else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
+        else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+
+        else {
+            std::cerr << "Undefined condition";
+            throw std::out_of_range("error in if");
+        }
+        str += " _nope" + std::to_string(num_if) + "_";
+        addLine(str.data());
+                /***  right part if   ***/
+        //ptr->GetRightNode() -- *then
+        generateThenElseExpr (ptr->GetRightNode());
+        ////
+        //after then
+        if (ptr->GetRightNode()->GetRightNode() != nullptr){
+            str = "jmp _end" + std::to_string(num_if) + "_";
+            addLine(str.data());
+        }
+
+        str = " _nope" + std::to_string(num_if) + "_:";
+        addLine(str.data());
+
+        if (ptr->GetRightNode()->GetRightNode() != nullptr) {
+
+            generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
+            str = " _end" + std::to_string(num_if) + "_:";
+            addLine(str.data());
+        }
+
+                        /*** goto in if ***/
+
+    }else if (node->GetLeftNode()->GetValue() == "goto"){
+        std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
+        addLine(str.data());
+    }else if (node->GetLeftNode()->GetValue() == "begin") {
         /*** begin end ***/
         generateCompound(node->GetLeftNode()->GetRightNode());//for begin/end
+    }else {
+        std::cerr << "<E> GenCode in if can be :=/if/goto or begin/end" << std::endl;
+        throw std::out_of_range("");
     }
 }
