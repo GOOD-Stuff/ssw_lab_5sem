@@ -1,13 +1,15 @@
 program kursach;
-    var
-        b : integer;
-        a, d : integer;
+var
+b : integer;
+a, d : integer;
+metka:label;
 
-    begin
-    begin
-           if a = 1 then begin
-           a:=1;
-           end;
-           else a:=12;
-    end;
-    end.
+begin
+begin
+metka:
+if a <> 1 then begin
+a:=1;
+end
+else goto metka;
+end;
+end.

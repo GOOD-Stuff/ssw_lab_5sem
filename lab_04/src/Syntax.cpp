@@ -392,7 +392,7 @@ Tree *Syntax::compoundParse(lex_it &t_iter, int compound_count) {
         auto *subTree = stateParse(t_iter, compound_count);
 
         if (subTree != nullptr) {
-            if ((subTree->GetLeftNode() == nullptr) || (subTree->GetRightNode() == nullptr)) {
+            if ((subTree->GetLeftNode() == nullptr) && (subTree->GetRightNode() == nullptr)) {
                 tree->AddRightNode(subTree->GetValue());
                 tree = tree->GetRightNode();
                 //meybi///////////////////////////
@@ -522,34 +522,38 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             }
             tree_exp->AddLeftNode(t_iter->GetName());
             tree_exp->GetLeftNode()->AddLeftTree(tree_exp->GetRightNode());
-            expressionParse(t_iter, tree_exp, mult, "if");
+            expressionParse(t_iter, tree_exp->GetLeftNode(), mult, "if");
             if (iter->GetToken() == if_tk) {
                 if (t_iter->GetToken() != then_tk) {
                     printError(MUST_BE_THEN, *t_iter);
                     return nullptr;
                 }
             }
-            tree_exp->GetLeftNode()->AddRightTree(tree_exp->GetRightNode());
+            //tree_exp->GetLeftNode()->AddRightTree(tree_exp->GetRightNode());
             tree_exp->AddRightNode("then");
             auto then_exp = tree_exp->GetRightNode();
             auto var_iter = getNextLex(t_iter);
             result_tree = tree_exp;
-            
 
             if ((var_iter->GetToken() == id_tk)||(var_iter->GetToken() == begin_tk)|| (var_iter->GetToken() == goto_tk)) {
                 var_iter = getPrevLex(var_iter);
                 result_tree->GetRightNode()->AddLeftTree(stateParse(var_iter, compound_count_f));
+                var_iter->GetName();
             }
+
             if (var_iter->GetToken() == else_tk) {
                 then_exp->AddRightNode("else");
                 getNextLex(var_iter);
-                if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)) {
+                if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)||(var_iter->GetToken() == goto_tk)) {
                     var_iter = getPrevLex(var_iter);
                     then_exp->GetRightNode()->AddLeftTree(stateParse(var_iter, compound_count_f));
                 }
             }
-
             t_iter = var_iter;
+            if (!checkLexem(t_iter, semi_tk)) {
+                printError(MUST_BE_SEMI, *t_iter);
+                return nullptr;
+            }
             break;
         }
 
@@ -559,7 +563,7 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             auto *tree_comp = compoundParse(t_iter, compound_count_f);
             getNextLex(t_iter);
 
-            if (!checkLexem(t_iter, semi_tk)) {
+            if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, else_tk))) {
                 printError(MUST_BE_SEMI, *t_iter);
                 return nullptr;
             }
@@ -602,6 +606,10 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
         }
 
         default: {
+            if (t_iter->GetToken() == else_tk) {
+                printError(MUST_BE_SEMI, *t_iter);
+                return nullptr;
+            }
             break;
         }
     }

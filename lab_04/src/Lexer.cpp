@@ -235,7 +235,7 @@ Lexem Lexer::getLex() {
                         lex += ch;
                         tok = comp_tk;
                     }
-                    if ((save_ch == '<') && (lex == ">")) {
+                    if ((save_ch == '<') && (ch == '>')) {
                         skip_get = false;
                         lex += ch;
                         tok = comp_tk;
