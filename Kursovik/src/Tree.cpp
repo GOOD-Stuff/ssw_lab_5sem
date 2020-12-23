@@ -68,8 +68,10 @@ Tree* Tree::GetLeftNode() const {
  * @return none
 */
 void Tree::AddLeftTree(Tree* tree) {
-    tree->parent = this;
-    this->left = tree;
+    if (tree != nullptr) {
+        tree->parent = this;
+        this->left = tree;
+    }
 }
 
 

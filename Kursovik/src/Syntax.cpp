@@ -439,7 +439,7 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             }
 
             if ((id_map.find(t_iter->GetName())->second.type == "label")) {
-                if (id_map.find(t_iter->GetName())->second.label_is == false) {
+                if (id_map.find(t_iter->GetName())->second.label_is == true) {
                     printError(LABEL_OVER, *t_iter);
                     return nullptr;
                 }
@@ -448,7 +448,9 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
                     return nullptr;
                 }
                 result_tree = Tree::CreateNode(iter->GetName());
-                id_map.find(t_iter->GetName())->second.label_is = true;
+                
+                id_map.find(getPrevLex(t_iter)->GetName())->second.label_is = true;
+                getNextLex(t_iter);
 
                 return result_tree;
             }

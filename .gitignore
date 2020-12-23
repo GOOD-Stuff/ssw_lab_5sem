@@ -177,3 +177,10 @@ lab_04/out/build/x64-Debug (по умолчанию)/kursach.S
 lab_04/CMakeSettings.json
 Kursovik/CMakeSettings.json
 Kursovik/README.md
+Kursovik/out/build/x64-Debug/VSInheritEnvironments.txt
+Kursovik/out/build/x64-Debug/source.p
+Kursovik/out/build/x64-Debug/rules.ninja
+Kursovik/out/build/x64-Debug/dest.S.S
+Kursovik/out/build/x64-Debug/build.ninja
+Kursovik/out/build/x64-Debug/.ninja_log
+Kursovik/out/build/x64-Debug/.ninja_deps
