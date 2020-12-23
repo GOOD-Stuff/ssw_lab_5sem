@@ -9,7 +9,6 @@ Lexer::Lexer(const char *file_path) {
         ;
         std::string lel(exp.what());
 
-
         throw std::runtime_error(what + lel);
     }
 }
@@ -170,7 +169,7 @@ Lexem Lexer::getLex() {
                     break;
 
                 case '=' :
-                    tok = eqv_tk;
+                    tok = comp_tk;
                     break;
 
                 case '+' :
@@ -217,31 +216,43 @@ Lexem Lexer::getLex() {
 
             }
 
+            bool skip_get{ false };
             lex += ch;
 
             if (tok == ddt_tk) {
                 ch = getChar();
-
+                skip_get = true;
                 if (ch == '=') {
+                    skip_get = false;
                     lex += ch;
                     tok = ass_tk;
                 }
             }
 
             if (tok == comp_tk) {
-                ch = getChar();
+                auto save_ch = ch;
 
-                if (ch == '=') {
-                    lex += ch;
-                    tok = comp_tk;
-                }
-                if ((ch == '>') && (lex == "<")) {
-                    lex += ch;
-                    tok = comp_tk;
+                ch = getChar();
+                skip_get = true;
+                if ((save_ch == '<') || (save_ch == '>')) {
+
+                    if (ch == '=') {
+                        skip_get = false;
+                        lex += ch;
+                        tok = comp_tk;
+                    }
+                    if ((save_ch == '<') && (lex == ">")) {
+                        skip_get = false;
+                        lex += ch;
+                        tok = comp_tk;
+                    }
+                
                 }
             }
 
-            getChar(); // some kind of k o s t y l; here we look on \n
+            if(!skip_get)
+                getChar();
+
             return Lexem(std::move(lex), tok, line);
         } else {
             std::cerr << "<E> Unknown token " << ch << std::endl;

@@ -17,7 +17,6 @@ enum tokens {
     comma_tk,           // ','
     ddt_tk,             // ':'
     semi_tk,            // ';'
-    eqv_tk,             // '='
     ass_tk,             // ':='
     add_tk,             // '+'
     sub_tk,             // '-'

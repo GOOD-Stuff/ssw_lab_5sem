@@ -259,7 +259,7 @@ int Syntax::vardpParse(Syntax::lex_it &t_iter, Tree *t_tree) {
     
     bool is_value{ false };
     auto lex_value{ t_iter };
-    if (checkLexem(t_iter, eqv_tk)) {
+    if (t_iter->GetName() == "=") {
         getNextLex(t_iter);
         if (type_iter->GetName() == "integer") {
             if (!checkLexem(t_iter, constant_tk)) {
@@ -399,6 +399,7 @@ Tree *Syntax::compoundParse(lex_it &t_iter, int compound_count) {
             if ((subTree->GetLeftNode() == nullptr) || (subTree->GetRightNode() == nullptr)) {
                 tree->AddRightNode(subTree->GetValue());
                 tree = tree->GetRightNode();
+                //meybi///////////////////////////
             }
             else {
                 tree->AddRightNode(label(), 0);
@@ -635,13 +636,17 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
                 printError(UNKNOWN_ID, *t_iter);
                 return nullptr;
             }
+            getNextLex(t_iter);
+            if ((t_iter->GetToken() != semi_tk) && (t_iter->GetToken() != else_tk)) {
+                printError(MUST_BE_SEMI, *t_iter);
+                return nullptr;
+            }
+            
 
             break;
         }
 
         default: {
-                if(t_iter->GetToken() == else_tk)
-                printError(UNKNOWN_ID, *t_iter);
             break;
         }
     }
@@ -857,8 +862,7 @@ Tree *Syntax::simplExprParse(const Syntax::lex_it &var_iter,
         case add_tk:
         case sub_tk:
         case mul_tk:
-        case div_op_tk:  
-        case eqv_tk:{
+        case div_op_tk:{
             if ((iter->GetToken() == comp_tk) && (var_type == "integer")) {
                 printError(INCOMP_TYPES, *t_iter);
             }
@@ -935,7 +939,6 @@ Tree* Syntax::simplExprParse(Tree* var_tree,
     case sub_tk:
     case mul_tk:
     case div_op_tk:
-    case eqv_tk:
     case comp_tk: {
 
         if (operations.at(iter->GetName()) + mult <=
