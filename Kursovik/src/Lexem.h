@@ -31,6 +31,7 @@ enum tokens {
     false_tk,           // 'false'
     goto_tk,            // 'goto'
     comp_tk,            // '<=' '>=' '<>' '>' '<'
+    label_tk,           //  'label'
     eof_tk              // end of file
 };
 
@@ -54,6 +55,7 @@ enum errors {
     INCOMP_TYPES,    // Error: Incompatible types
     MUST_BE_COMP,    // Error: Must be '<>!='
     MUST_BE_DDT,     // Error: Must be :
+    MUST_BE_VAR,     // Error: Must be var
     LABEL_OVER,      // Eror: 2 and more Label in prog
     UNDEF_LABEL,     // Label Used but not defined
 };

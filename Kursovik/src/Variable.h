@@ -9,9 +9,7 @@ public:
         value(t_value) {};
     std::string type;
     std::string value;
-    bool mas_is{false};
     bool label_is{ false };
-    std::pair<int, int>range;
 };
 
 

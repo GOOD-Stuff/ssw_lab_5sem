@@ -19,7 +19,10 @@ int main(int argc, char* argv[]){
             std::string source = "source.p";
             std::string dest = "dest.S";
             Parse(source, dest);
+            std::getchar();
+            return 0;
         }
+
         if (argc == 2) {
             std::string help = argv[1];
             if (help == "-help") {
@@ -29,7 +32,7 @@ int main(int argc, char* argv[]){
                 return 0;
             }
         }
-        std::cout << "Incorrect args\n";
+        std::cout << "Incorrect args!!!\n";
     }
     std::getchar();
     return 0;
