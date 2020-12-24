@@ -17,7 +17,9 @@ public:
     explicit Syntax(std::vector<Lexem> &&t_lex_table);
     int ParseCode();
     ~Syntax();
-    Tree* retTree() const { return root_tree; };
+    Tree* retTree() const {
+        return root_tree;
+    };
 
 private:
     using lex_it = std::vector<Lexem>::iterator; // alias of vector iterator
@@ -38,7 +40,8 @@ private:
     int   expressionParse(lex_it& t_iter, Tree* tree, int& mult, std::string var_type);
     Tree  *simplExprParse            (const lex_it &var_iter, lex_it &t_iter,
                                       Tree *tree, int& mult, std::string var_type);
-    Tree* simplExprParse(Tree* var_tree, Syntax::lex_it& t_iter, Tree* tree, int& mult, std::string type_var);
+    Tree* simplExprParse(Tree* var_tree, Syntax::lex_it& t_iter, Tree* tree, int& mult,
+                         std::string type_var);
 
     Tree* stateParse                 (lex_it &t_iter, int compound_count_f);
     Tree* compoundParse              (lex_it &t_iter, int compound_count_f);
@@ -55,9 +58,9 @@ private:
     void updateVarTypes(const std::list<std::string> &t_var_list,
                         const std::string &t_type_name);
     void updateVarValue(const std::list<std::string>& t_var_list,
-        const std::string& t_value);
+                        const std::string& t_value);
     void updateVarTypes(const std::list<std::string>& t_var_list,
-        const std::string& t_type_name, const std::pair<int, int>& range);
+                        const std::string& t_type_name, const std::pair<int, int>& range);
     void buildVarTree  (const std::list<std::string> &t_var_list, Tree *t_tree);
     void buildVarTree  (const std::list<std::string>& t_var_list, Tree* t_tree,
                         Tree* array_tree);

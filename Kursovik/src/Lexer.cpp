@@ -102,8 +102,7 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), type_tk, line);
             } else if (lex == "boolean") {
                 return Lexem(std::move(lex), type_tk, line);
-            }
-            else if (lex == "label") {
+            } else if (lex == "label") {
                 return Lexem(std::move(lex), type_tk, line);
             } else if (lex == "end")     {
                 return Lexem(std::move(lex), end_tk, line);
@@ -115,8 +114,7 @@ Lexem Lexer::getLex() {
                 return Lexem(std::move(lex), true_tk, line);
             } else if (lex == "false")     {
                 return Lexem(std::move(lex), false_tk, line);
-            }
-            else if (lex == "then") {
+            } else if (lex == "then") {
                 return Lexem(std::move(lex), then_tk, line);
             }
 
@@ -198,6 +196,7 @@ Lexem Lexer::getLex() {
             if (tok == ddt_tk) {
                 ch = getChar();
                 skip_get = true;
+
                 if (ch == '=') {
                     skip_get = false;
                     lex += ch;
@@ -210,6 +209,7 @@ Lexem Lexer::getLex() {
 
                 ch = getChar();
                 skip_get = true;
+
                 if ((save_ch == '<') || (save_ch == '>')) {
 
                     if (ch == '=') {
@@ -217,16 +217,17 @@ Lexem Lexer::getLex() {
                         lex += ch;
                         tok = comp_tk;
                     }
+
                     if ((save_ch == '<') && (ch == '>')) {
                         skip_get = false;
                         lex += ch;
                         tok = comp_tk;
                     }
-                
+
                 }
             }
 
-            if(!skip_get)
+            if (!skip_get)
                 getChar();
 
             return Lexem(std::move(lex), tok, line);
