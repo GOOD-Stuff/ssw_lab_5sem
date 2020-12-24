@@ -76,9 +76,11 @@ int Syntax::ParseCode() {
     std::cout << "**************************************TREE************************************";
     std::cout << "\r\n";
 
-    if (!error_state) root_tree->PrintTree(0);
-
-    return EXIT_SUCCESS;
+    if (!error_state) { root_tree->PrintTree(0); 
+        return EXIT_SUCCESS;
+    }
+    
+    return -EXIT_FAILURE;
 }
 
 
@@ -1105,29 +1107,6 @@ void Syntax::updateVarValue(const std::list<std::string>& t_var_list,
     catch (const std::exception& exp) {
         std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
             << exp.what() << std::endl;
-    }
-}
-
-/**
- * @brief Update information about type in map of identifiers
- * @param[in] t_var_list  - list of variables
- * @param[in] t_type_name - type of variables
- * @param[in] range - range of array
- * 
- * @return none
- */
-void Syntax::updateVarTypes(const std::list<std::string> &t_var_list,
-                            const std::string &t_type_name, const std::pair<int, int>& range) {
-    try {
-        for (auto& el : t_var_list) {
-            id_map.at(el).type = t_type_name;
-            id_map.at(el).mas_is = true;
-            id_map.at(el).range.first = range.first;
-            id_map.at(el).range.second = range.second;
-        }
-    } catch (const std::exception &exp) {
-        std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
-                  << exp.what() << std::endl;
     }
 }
 

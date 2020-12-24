@@ -59,10 +59,10 @@ int Parse(const std::string& file_path, const std::string& path_dest) {
               std::endl;
 
     Syntax syntx(std::move(table));
-    syntx.ParseCode();
+    auto status = syntx.ParseCode();
     auto tree = syntx.retTree();
 
-    if (tree == nullptr) {
+    if ((tree == nullptr)||(status)) {
         std::cerr << "<E> Incorrect syntax tree, abort!" << std::endl;
         return -EXIT_FAILURE;
     }
