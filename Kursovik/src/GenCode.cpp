@@ -331,10 +331,11 @@ int GenCode::generateCompound(Tree *node) {
                 addLine(str.data());
 
                 if (ptr->GetRightNode()->GetRightNode() != nullptr) {
-
-                    generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
-                    str = " _end" + std::to_string(num_if) + "_:";
-                    addLine(str.data());
+                    if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() != nullptr) {
+                        generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
+                        str = " _end" + std::to_string(num_if) + "_:";
+                        addLine(str.data());
+                    }
                 }
 
                 /****** operation goto *******/
@@ -757,10 +758,11 @@ void GenCode::generateThenElseExpr(Tree *node) {
         addLine(str.data());
 
         if (ptr->GetRightNode()->GetRightNode() != nullptr) {
-
-            generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
-            str = " _end" + std::to_string(num_if) + "_:";
-            addLine(str.data());
+            if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() != nullptr) {
+                generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
+                str = " _end" + std::to_string(num_if) + "_:";
+                addLine(str.data());
+            }
         }
 
         /*** goto in if ***/
