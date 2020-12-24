@@ -56,6 +56,7 @@ enum errors {
     MUST_BE_DDT,     // Error: Must be :
     LABEL_OVER,      // Eror: 2 and more Label in prog
     UNDEF_LABEL,     // Label Used but not defined
+    NOT_INIT,        // Not inizial.
 };
 
 

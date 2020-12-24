@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
     else {
         if (argc == 1) {
             std::string source = "source.p";
-            std::string dest = "dest.S";
+            std::string dest = "dest";
             Parse(source, dest);
         }
         if (argc == 2) {

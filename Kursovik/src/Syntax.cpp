@@ -497,11 +497,18 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
                 printError(MUST_BE_ID, *t_iter);
                 return nullptr;
             }
-            if (id_map.find(t_iter->GetName())->second.label_is == false) {
-                printError(UNDEF_LABEL, *t_iter);
+            auto search = id_map.find(t_iter->GetName());
+            if (search != id_map.end()) {
+                if (search->second.label_is == false) {
+                    printError(UNDEF_LABEL, *t_iter);
+                    return nullptr;
+                }
+            }
+            else {
+                printError(NOT_INIT, *t_iter);
                 return nullptr;
             }
-            auto search = id_map.find(t_iter->GetName());
+            search = id_map.find(t_iter->GetName());
             if (search != id_map.end()) {
                 if ((search->second.type) != "label") {
                     printError(INCOMP_TYPES, *t_iter);
@@ -933,6 +940,11 @@ void Syntax::printError(errors t_err, Lexem lex) {
         }
         case UNDEF_LABEL: {
             std::cerr << "<E> Syntax: Undefined label " << lex.GetLine() << " line" <<
+                std::endl;
+            break;
+        }
+        case NOT_INIT: {
+            std::cerr << "<E> Syntax: ninitialized variable " << lex.GetLine() << " line" <<
                 std::endl;
             break;
         }
