@@ -58,6 +58,7 @@ enum errors {
     MUST_BE_VAR,     // Error: Must be var
     LABEL_OVER,      // Eror: 2 and more Label in prog
     UNDEF_LABEL,     // Label Used but not defined
+    NOT_INIT,        // Not inizial.
 };
 
 

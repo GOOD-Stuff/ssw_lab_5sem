@@ -39,15 +39,24 @@ int Parse(const std::string& file_path, const std::string& path_dest) {
     Lexer lex(file_path.c_str());
     auto table = lex.ScanCode();
 
-    if (table.empty()) { return 0; }
-    
-    std::cout << "***************************Table of lexem ************************************\n";
-    std::setiosflags(std::ios::left);
-    for (auto i = 0; i < table.size(); i++) {//out lex
-        std::cout <<"Name: " <<  std::setw(10) << table[i].GetName()<< std::setw(10) <<"Token: " << std::setw(10)
-            << table[i].GetToken() << std::setw(10) <<"Line: "<< std::setw(10) << table[i].GetLine() << std::endl;
+    if (table.empty()) {
+        return 0;
     }
-    std::cout << "******************************************************************************" << std::endl;
+
+    std::cout <<
+              "***************************Table of lexem ************************************\n";
+    std::setiosflags(std::ios::left);
+
+    for (auto i = 0; i < table.size(); i++) {//out lex
+        std::cout << "Name: " <<  std::setw(10) << table[i].GetName() << std::setw(
+                      10) << "Token: " << std::setw(10)
+                  << table[i].GetToken() << std::setw(10) << "Line: " << std::setw(
+                      10) << table[i].GetLine() << std::endl;
+    }
+
+    std::cout <<
+              "******************************************************************************" <<
+              std::endl;
 
     Syntax syntx(std::move(table));
     syntx.ParseCode();

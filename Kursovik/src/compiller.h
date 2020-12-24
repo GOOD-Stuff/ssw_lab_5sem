@@ -1,8 +1,8 @@
 #ifndef LECS_PARS_LCOMP_H
 #define LECS_PARS_LCOMP_H
 
-#include <fstream>      
-#include <iostream>    
+#include <fstream>
+#include <iostream>
 #include <list>
 #include <map>
 #include <string>
@@ -13,4 +13,4 @@
 
 
 int Parse(const std::string& file_path, const std::string& path_dest);
-#endif 
+#endif
