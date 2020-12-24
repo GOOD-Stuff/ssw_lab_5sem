@@ -317,7 +317,8 @@ int GenCode::generateCompound(Tree *node) {
                 addLine(str.data());
                 /***  right part if   ***/
                 //ptr->GetRightNode() -- *then
-                generateThenElseExpr (ptr->GetRightNode());
+                if (ptr->GetRightNode()->GetLeftNode()!=nullptr)
+                    generateThenElseExpr (ptr->GetRightNode());
                 ////
 
 
@@ -745,7 +746,8 @@ void GenCode::generateThenElseExpr(Tree *node) {
         addLine(str.data());
         /***  right part if   ***/
         //ptr->GetRightNode() -- *then
-        generateThenElseExpr (ptr->GetRightNode());
+        if (ptr->GetRightNode()->GetLeftNode()!=nullptr)
+            generateThenElseExpr (ptr->GetRightNode());
 
         ////
         //after then
