@@ -738,7 +738,8 @@ Tree *Syntax::simplExprParse(const Syntax::lex_it &var_iter,
         case mul_tk:
         case div_op_tk:
         case comp_tk:{
-            if (((iter->GetName() != "=")||(iter->GetName() != "<>")) && (var_type == "boolean")) {
+            if (((iter->GetName() != "=")&&(iter->GetName() != "<>")&&(iter->GetName() != "<") && (iter->GetName() != ">") 
+                 && (iter->GetName() != "<=") && (iter->GetName() != ">=")) && (var_type == "boolean")) {
                 printError(INCOMP_TYPES, *t_iter);
             }
             if ((iter->GetToken() == comp_tk) && (var_type == "comp_integer") || (var_type == "comp_boolean")) {
