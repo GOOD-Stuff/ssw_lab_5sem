@@ -36,12 +36,12 @@ Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
     operations.emplace("*",   3);
     operations.emplace("div", 3);
 
-    operations.emplace("=", 4);
-    operations.emplace("<", 4);
-    operations.emplace(">", 4);
-    operations.emplace("<=", 4);
-    operations.emplace(">=", 4);
-    operations.emplace("<>", 4);
+    operations.emplace("=", 1);
+    operations.emplace("<", 1);
+    operations.emplace(">", 1);
+    operations.emplace("<=", 1);
+    operations.emplace(">=", 1);
+    operations.emplace("<>", 1);
 }
 
 
@@ -441,6 +441,13 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             auto* tree_exp = Tree::CreateNode(t_iter->GetName());
             auto mult = 0;
             expressionParse(t_iter, tree_exp, mult, "if");
+            auto sr = tree_exp->GetRightNode()->GetValue();
+            if ((sr != "<") && (sr != ">") && (sr != "<=") && (sr != ">=") && (sr != "<>") && (sr != "=")) {
+                printError(MUST_BE_COMP, *t_iter);
+                Tree::FreeTree(tree_exp);
+                return nullptr;
+            }
+
 
             tree_exp->AddLeftTree(tree_exp->GetRightNode());
             if (iter->GetToken() == if_tk) {
@@ -469,10 +476,6 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
                 }
             }
             t_iter = var_iter;
-            if (!checkLexem(t_iter, semi_tk)) {
-                printError(MUST_BE_SEMI, *t_iter);
-                return nullptr;
-            }
             break;
         }
 
@@ -597,6 +600,7 @@ int Syntax::expressionParse(lex_it &t_iter, Tree *tree, int& mult, std::string v
                 if (var_type == "if") { 
                     if (var_iter->GetToken() == id_tk) subTree = simplExprParse(var_iter, t_iter, tree, mult, id_map.find(var_iter->GetName())->second.type);
                     if (var_iter->GetToken() == constant_tk) subTree = simplExprParse(var_iter, t_iter, tree, mult, "integer");
+                    
                 }
                 else {
                     if ((var_type == "comp_integer") || (var_type == "comp_boolean")) {
@@ -947,7 +951,6 @@ void Syntax::printError(errors t_err, Lexem lex) {
             break;
         }
 
-
         case INCOMP_TYPES: {
             std::cerr << "<E> Syntax: Incompatible types " << lex.GetLine() << " line" <<
                       std::endl;
@@ -970,6 +973,12 @@ void Syntax::printError(errors t_err, Lexem lex) {
                 std::endl;
             break;
         }
+        case MUST_BE_COMP: {
+            std::cerr << "<E> Syntax: Must be  '>, <, <= ...' on " << lex.GetLine() << " line" <<
+                std::endl;
+            break;
+        }
+
 
         default: {
             std::cerr << "<E> Syntax: Undefined type of error" << std::endl;
