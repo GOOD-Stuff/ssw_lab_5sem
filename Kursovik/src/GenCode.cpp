@@ -334,9 +334,9 @@ int GenCode::generateCompound(Tree *node) {
                 if (ptr->GetRightNode()->GetRightNode() != nullptr) {
                     if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() != nullptr) {
                         generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
-                        str = " _end" + std::to_string(num_if) + "_:";
-                        addLine(str.data());
                     }
+                    str = " _end" + std::to_string(num_if) + "_:";
+                    addLine(str.data());
                 }
 
                 /****** operation goto *******/
@@ -359,8 +359,11 @@ int GenCode::generateCompound(Tree *node) {
                     std::string str = "movl ";
                     (checkVariable(node->GetLeftNode()->GetRightNode()->GetValue()) == nullptr) ? str +=
                         "$" : "";
-                    str += node->GetLeftNode()->GetRightNode()->GetValue() + ", " +
-                           node->GetLeftNode()->GetLeftNode()->GetValue();
+                    if (node->GetLeftNode()->GetRightNode()->GetValue()== "true") str += "1";
+                    else if (node->GetLeftNode()->GetRightNode()->GetValue()== "false") str += "0";
+                    else str+= node->GetLeftNode()->GetRightNode()->GetValue();
+                    str+=  ", " +node->GetLeftNode()->GetLeftNode()->GetValue();
+
                     addLine(str.data());
 
                 } else {/***for d:= 1+2...(d:=expression)***/
@@ -409,6 +412,9 @@ void GenCode::generateExpressions(Tree *node) {
             //push $12 or push a;
             std::string str = "pushl ";
             (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
+            if (node->GetValue()== "true") str += "1";
+            else if (node->GetValue()== "false") str += "0";
+            else str+= node->GetValue();
             str += node->GetValue();
             addLine(str.data());
 
@@ -417,7 +423,10 @@ void GenCode::generateExpressions(Tree *node) {
             //movl $12, %ebx or movl a, %ebx;
             std::string str = "movl ";
             (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
-            str += node->GetValue() + ", %ebx";
+            if (node->GetValue()== "true") str += "1";
+            else if (node->GetValue()== "false") str += "0";
+            else str+= node->GetValue();
+            str += ", %ebx";
             addLine(str.data());
 
         }
@@ -660,7 +669,9 @@ void GenCode::generateAfterCondition(Tree* node) {
 
         std::string str = "pushl ";
         (checkVariable(node->GetValue()) == nullptr) ? str += "$" : "";
-        str += node->GetValue();
+        if (node->GetValue()== "true") str += "1";
+        else if (node->GetValue()== "false") str += "0";
+        else str+= node->GetValue();
         addLine(str.data());
     } else {//expression
         generateExpressions(node);
@@ -685,8 +696,10 @@ void GenCode::generateThenElseExpr(Tree *node) {
             std::string str = "movl ";
             (checkVariable(node->GetLeftNode()->GetRightNode()->GetValue()) == nullptr) ? str +=
                 "$" : "";
-            str += node->GetLeftNode()->GetRightNode()->GetValue() + ", " +
-                   node->GetLeftNode()->GetLeftNode()->GetValue();
+            if (node->GetLeftNode()->GetRightNode()->GetValue()== "true") str += "1";
+            else if (node->GetLeftNode()->GetRightNode()->GetValue()== "false") str += "0";
+            else str+= node->GetLeftNode()->GetRightNode()->GetValue();
+            str +=  ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
             addLine(str.data());
 
         } else {/***for d:= 1+2...(d:=expression)***/
@@ -762,9 +775,9 @@ void GenCode::generateThenElseExpr(Tree *node) {
         if (ptr->GetRightNode()->GetRightNode() != nullptr) {
             if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() != nullptr) {
                 generateThenElseExpr(ptr->GetRightNode()->GetRightNode());
-                str = " _end" + std::to_string(num_if) + "_:";
-                addLine(str.data());
             }
+            str = " _end" + std::to_string(num_if) + "_:";
+            addLine(str.data());
         }
 
         /*** goto in if ***/
