@@ -282,35 +282,53 @@ int GenCode::generateCompound(Tree *node) {
                     throw std::out_of_range("error in if");
                 }
 
-                if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
+                /*if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
                     std::cerr << "<E> GenCode: need expression" << std::endl;
                     throw std::out_of_range("error in if");
-                }
+                }*/
 
                 num_if++;
 
+
                 /***  left part if   ***/
-                //left part after > < <> =
-
-                generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
-                //left part in stack
-                generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
-                //right part in stack
-                addLine("popl %ebx");
-                addLine("popl %eax");
-                addLine("cmp %ebx, %eax");
                 std::string str;
+                //left part after > < <> =
+                // if (a) then...
 
-                if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
-                else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
-                else if (ptr->GetLeftNode()->GetValue() == "=") str = "jgl";
-                else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
-                else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
-                else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+                if (ptr->GetLeftNode()->GetValue() == "true" ||
+                        ptr->GetLeftNode()->GetValue() == "false" ||
+                        (checkVariable(ptr->GetLeftNode()->GetValue()) != nullptr)){
 
-                else {
-                    std::cerr << "Undefined condition";
-                    throw std::out_of_range("error in if");
+                    if (ptr->GetLeftNode()->GetValue() == "true") addLine("movl $1, %eax");
+                    else if (ptr->GetLeftNode()->GetValue() == "false") addLine("movl $0, %eax");
+                    else {
+                        str = "movl " +  ptr->GetLeftNode()->GetValue() + ", %eax";
+                        addLine(str.data());
+                    }
+                    addLine("movl $0, %ebx");
+                    addLine("cmp %ebx, %eax");
+                    str = "jle ";
+
+                }else{
+                    generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
+                    //left part in stack
+                    generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
+                    //right part in stack
+                    addLine("popl %ebx");
+                    addLine("popl %eax");
+                    addLine("cmp %ebx, %eax");
+
+                    if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
+                    else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
+                    else if (ptr->GetLeftNode()->GetValue() == "=") str = "jgl";
+                    else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
+                    else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
+                    else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+
+                    else {
+                        std::cerr << "Undefined condition";
+                        throw std::out_of_range("error in if");
+                    }
                 }
 
                 str += " _nope" + std::to_string(num_if) + "_";
@@ -715,6 +733,7 @@ void GenCode::generateThenElseExpr(Tree *node) {
     } else if (node->GetLeftNode()->GetValue() == "if") {
         num_if++;
         auto ptr = node->GetLeftNode();
+        std::cout << ptr->GetValue();
 
         if (ptr->GetLeftNode() == nullptr ) {
             std::cerr << "<E> GenCode: need condition in if" << std::endl;
@@ -726,33 +745,50 @@ void GenCode::generateThenElseExpr(Tree *node) {
             throw std::out_of_range("error in if");
         }
 
-        if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
+        /*if (ptr->GetLeftNode()->GetLeftNode() == nullptr) {
             std::cerr << "<E> GenCode: need expression" << std::endl;
             throw std::out_of_range("error in if");
-        }
+        }*/
 
         /***  left part if   ***/
         //left part after > < <> =
 
-        generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
-        //left part in stack
-        generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
-        //right part in stack
-        addLine("popl %ebx");
-        addLine("popl %eax");
-        addLine("cmp %ebx, %eax");
         std::string str;
+        if (ptr->GetLeftNode()->GetValue() == "true" ||
+            ptr->GetLeftNode()->GetValue() == "false" ||
+            (checkVariable(ptr->GetLeftNode()->GetValue()) != nullptr)){
 
-        if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
-        else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
-        else if (ptr->GetLeftNode()->GetValue() == "=") str = "jgl";
-        else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
-        else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
-        else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+            if (ptr->GetLeftNode()->GetValue() == "true") addLine("movl $1, %eax");
+            else if (ptr->GetLeftNode()->GetValue() == "false") addLine("movl $0, %eax");
+            else {
+                str = "movl " +  ptr->GetLeftNode()->GetValue() + ", %eax";
+                addLine(str.data());
+            }
+            addLine("movl $0, %ebx");
+            addLine("cmp %ebx, %eax");
+            str = "jle ";
 
-        else {
-            std::cerr << "Undefined condition";
-            throw std::out_of_range("error in if");
+        }else{
+            generateAfterCondition(ptr->GetLeftNode()->GetLeftNode());
+            //left part in stack
+            generateAfterCondition(ptr->GetLeftNode()->GetRightNode());
+            //right part in stack
+            addLine("popl %ebx");
+            addLine("popl %eax");
+            addLine("cmp %ebx, %eax");
+            std::string str;
+
+            if (ptr->GetLeftNode()->GetValue() == ">") str = "jle ";
+            else if (ptr->GetLeftNode()->GetValue() == "<") str = "jge";
+            else if (ptr->GetLeftNode()->GetValue() == "=") str = "jgl";
+            else if (ptr->GetLeftNode()->GetValue() == "<>") str = "je";
+            else if (ptr->GetLeftNode()->GetValue() == ">=") str = "jl";//
+            else if (ptr->GetLeftNode()->GetValue() == "<=") str = "jg";//
+
+            else {
+                std::cerr << "Undefined condition";
+                throw std::out_of_range("error in if");
+            }
         }
 
         str += " _nope" + std::to_string(num_if) + "_";
