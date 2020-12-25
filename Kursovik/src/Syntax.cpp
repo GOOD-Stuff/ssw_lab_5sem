@@ -426,6 +426,11 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
 
             auto mult = 0;
             expressionParse(t_iter, tree_exp, mult, id_map.find(var_iter->GetName())->second.type);
+            if (tree_exp->GetRightNode() == nullptr) {
+                printError(MUST_BE_CONST, *t_iter);
+                Tree::FreeTree(tree_exp);
+                return nullptr;
+            }
 
             if (!checkLexem(t_iter, semi_tk)&&(!checkLexem(t_iter, else_tk))){
                 printError(MUST_BE_SEMI, *t_iter);
@@ -441,11 +446,21 @@ Tree* Syntax::stateParse(lex_it &t_iter, int compound_count_f) {
             auto* tree_exp = Tree::CreateNode(t_iter->GetName());
             auto mult = 0;
             expressionParse(t_iter, tree_exp, mult, "if");
+            if (tree_exp->GetRightNode() == nullptr) { return nullptr; };
             auto sr = tree_exp->GetRightNode()->GetValue();
-            if ((sr != "<") && (sr != ">") && (sr != "<=") && (sr != ">=") && (sr != "<>") && (sr != "=")) {
-                printError(MUST_BE_COMP, *t_iter);
-                Tree::FreeTree(tree_exp);
-                return nullptr;
+            if ((sr != "<") && (sr != ">") && (sr != "<=") && (sr != ">=") && (sr != "<>") && (sr != "=")&& (sr != "true") && (sr != "false")) {
+                if (!std::isdigit(static_cast<unsigned char>(sr[0]))){
+                    if(id_map.find(sr)->second.type != "boolean"){
+                        printError(MUST_BE_COMP, *t_iter);
+                        Tree::FreeTree(tree_exp);
+                        return nullptr;
+                    }
+                }
+                else {
+                    printError(MUST_BE_COMP, *t_iter);
+                    Tree::FreeTree(tree_exp);
+                    return nullptr;
+                }
             }
 
 
@@ -895,7 +910,7 @@ void Syntax::printError(errors t_err, Lexem lex) {
         }
 
         case MUST_BE_ID: {
-            std::cerr << "<E> Syntax: Must be identifier instead '" << lex.GetName()
+            std::cerr << "<E> Syntax: Must be identifier or begin instead '" << lex.GetName()
                       << "' on " << lex.GetLine() << " line"       << std::endl;
             break;
         }
@@ -978,7 +993,16 @@ void Syntax::printError(errors t_err, Lexem lex) {
                 std::endl;
             break;
         }
-
+        case MUST_BE_TYPE: {
+            std::cerr << "<E> Syntax: Must be type of id instead '" << lex.GetName()
+                << "' on " << lex.GetLine() << " line" << std::endl;
+            break;
+        }
+        case MUST_BE_CONST:{
+             std::cerr << "<E> Syntax: Must be constant or id instead '" << lex.GetName()
+             << "' on " << lex.GetLine() << " line" << std::endl;
+            break;
+        }
 
         default: {
             std::cerr << "<E> Syntax: Undefined type of error" << std::endl;
