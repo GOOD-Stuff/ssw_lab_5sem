@@ -1,16 +1,12 @@
 #include <iostream>
-#include "lab_01.h"
-
-
-/**
- * to build call: g++ main.cpp task_01.cpp -o task
- * or make
- */
-
+#include <regex>
+#include <map>
+#include <string>
+#include "lab_02.h"
 
 int main() {
-	std::cout << "Ah, here we go again" << std::endl;
-	Parse2("test.p");
+    std::cout << "Okey, okey, I get it" << std::endl;
+    Parse ("C:/test.p");
 
-	return 0;
+    return 0;
 }
